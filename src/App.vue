@@ -1,3 +1,7 @@
+<script setup lang="ts">
+import ResumePage from '@/features/resume/ui/ResumePage.vue'
+</script>
+
 <template>
-  <h1>Hello World</h1>
+  <ResumePage />
 </template>
