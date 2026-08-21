@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { contacts } from '../data/contacts'
-import type { Locale } from '../types'
-import PdfDownloadLink from './PdfDownloadLink.vue'
-import RoleLine from './RoleLine.vue'
+import { contacts } from '../data/contacts';
+import type { Locale } from '../types';
+import PdfDownloadLink from './PdfDownloadLink.vue';
+import RoleLine from './RoleLine.vue';
 
 defineProps<{
-  name: string
-  roleLine: string
-  locale: Locale
-}>()
+  name: string;
+  roleLine: string;
+  locale: Locale;
+}>();
 </script>
 
 <template>

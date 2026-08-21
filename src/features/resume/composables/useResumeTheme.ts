@@ -1,50 +1,50 @@
-import { computed, ref } from 'vue'
+import { computed, ref } from 'vue';
 
-import type { Theme } from '../types'
+import type { Theme } from '../types';
 
-const STORAGE_KEY = 'rb-resume-theme'
-const DEFAULT_THEME: Theme = 'light'
+const STORAGE_KEY = 'rb-resume-theme';
+const DEFAULT_THEME: Theme = 'light';
 
-const theme = ref<Theme>(DEFAULT_THEME)
+const theme = ref<Theme>(DEFAULT_THEME);
 
 function isTheme(value: string | null): value is Theme {
-  return value === 'light' || value === 'dark'
+  return value === 'light' || value === 'dark';
 }
 
 function readStoredTheme(): Theme {
   try {
-    const stored = localStorage.getItem(STORAGE_KEY)
+    const stored = localStorage.getItem(STORAGE_KEY);
     if (isTheme(stored)) {
-      return stored
+      return stored;
     }
   } catch {
     // private mode / blocked storage
   }
 
-  return DEFAULT_THEME
+  return DEFAULT_THEME;
 }
 
 function persistTheme(next: Theme): void {
   try {
-    localStorage.setItem(STORAGE_KEY, next)
+    localStorage.setItem(STORAGE_KEY, next);
   } catch {
     // private mode / blocked storage
   }
 }
 
 function applyTheme(next: Theme): void {
-  theme.value = next
-  document.documentElement.dataset.theme = next
+  theme.value = next;
+  document.documentElement.dataset.theme = next;
 }
 
 export function initResumeTheme(): void {
-  applyTheme(readStoredTheme())
+  applyTheme(readStoredTheme());
 }
 
 export function useResumeTheme() {
   function setTheme(next: Theme): void {
-    applyTheme(next)
-    persistTheme(next)
+    applyTheme(next);
+    persistTheme(next);
   }
 
   return {
@@ -52,5 +52,5 @@ export function useResumeTheme() {
     setTheme,
     isLight: computed(() => theme.value === 'light'),
     isDark: computed(() => theme.value === 'dark'),
-  }
+  };
 }

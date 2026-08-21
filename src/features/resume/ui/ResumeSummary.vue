@@ -1,29 +1,30 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed } from 'vue';
 
-const RS_SCHOOL = 'RS School'
+const RS_SCHOOL = 'RS School';
 
 const { summary } = defineProps<{
-  summary: string
-}>()
+  summary: string;
+}>();
 
 const parts = computed(() => {
-  const index = summary.indexOf(RS_SCHOOL)
+  const index = summary.indexOf(RS_SCHOOL);
 
   if (index === -1) {
-    return { pre: summary, post: '' }
+    return { pre: summary, post: '' };
   }
 
   return {
     pre: summary.slice(0, index),
     post: summary.slice(index + RS_SCHOOL.length),
-  }
-})
+  };
+});
 </script>
 
 <template>
   <p class="summary">
-    {{ parts.pre }}<a href="https://rs.school/" target="_blank" rel="noopener">RS School</a
+    {{ parts.pre
+    }}<a href="https://rs.school/" target="_blank" rel="noopener">RS School</a
     >{{ parts.post }}
   </p>
 </template>

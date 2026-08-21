@@ -1,24 +1,31 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed } from 'vue';
 
-import SegmentedToggle from '@/components/SegmentedToggle.vue'
+import SegmentedToggle from '@/components/SegmentedToggle.vue';
 
-import { useResumeLocale } from '../composables/useResumeLocale'
-import { useResumeTheme } from '../composables/useResumeTheme'
-import type { Locale, Theme } from '../types'
+import { useResumeLocale } from '../composables/useResumeLocale';
+import { useResumeTheme } from '../composables/useResumeTheme';
+import type { Locale, Theme } from '../types';
 
-const { locale, setLocale, copy } = useResumeLocale()
-const { theme, setTheme } = useResumeTheme()
+const { locale, setLocale, copy } = useResumeLocale();
+const { theme, setTheme } = useResumeTheme();
 
 const langOptions = [
   { value: 'en', label: 'EN', ariaLabel: 'English' },
   { value: 'ru', label: 'RU', ariaLabel: 'Русский' },
-] as const satisfies readonly { value: Locale; label: string; ariaLabel: string }[]
+] as const satisfies readonly {
+  value: Locale;
+  label: string;
+  ariaLabel: string;
+}[];
 
-const themeOptions = computed(() => [
-  { value: 'light' as const, ariaLabel: copy.value.lightLabel },
-  { value: 'dark' as const, ariaLabel: copy.value.darkLabel },
-] satisfies readonly { value: Theme; ariaLabel: string }[])
+const themeOptions = computed(
+  () =>
+    [
+      { value: 'light' as const, ariaLabel: copy.value.lightLabel },
+      { value: 'dark' as const, ariaLabel: copy.value.darkLabel },
+    ] satisfies readonly { value: Theme; ariaLabel: string }[],
+);
 </script>
 
 <template>

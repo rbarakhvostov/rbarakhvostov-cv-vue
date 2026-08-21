@@ -1,13 +1,15 @@
-import type { ResumeCopy } from '../types'
+import type { ResumeCopy } from '../types';
 
 export const en: ResumeCopy = {
   name: 'Roman Barakhvostov',
-  roleLine: 'Software Engineer | Frontend Developer | React Developer | Next.js Developer',
+  roleLine:
+    'Software Engineer | Frontend Developer | React Developer | Next.js Developer',
   summary:
     "Experienced Frontend Developer with over 6 years of hands-on experience in building high-quality user interfaces. Proficient in React, TypeScript, and JavaScript, with additional expertise in Next.js, Vue, and React Native. I also have a strong background in mentoring and technical leadership, including active participation in the RS School program. I am ready to apply my technical stack and expertise to drive the growth of your company's products.",
   expHeading: 'PROFESSIONAL EXPERIENCE',
   skillsHeading: 'SKILLS',
-  roleReactNext: 'Software Engineer | React Frontend Developer | Next.js Developer',
+  roleReactNext:
+    'Software Engineer | React Frontend Developer | Next.js Developer',
   roleReact: 'Software Engineer | React Frontend Developer',
   roleVue: 'Software Engineer | Vue Frontend Developer',
   lightLabel: 'Light',
@@ -44,4 +46,4 @@ export const en: ResumeCopy = {
       'Worked closely with an agile team (Scrum, Kanban)',
     ],
   },
-}
+};

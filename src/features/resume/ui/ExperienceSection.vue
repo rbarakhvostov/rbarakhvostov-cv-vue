@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { jobs } from '../data/jobs'
-import type { ResumeCopy } from '../types'
-import ExperienceItem from './ExperienceItem.vue'
+import { jobs } from '../data/jobs';
+import type { ResumeCopy } from '../types';
+import ExperienceItem from './ExperienceItem.vue';
 
 defineProps<{
-  copy: ResumeCopy
-}>()
+  copy: ResumeCopy;
+}>();
 </script>
 
 <template>

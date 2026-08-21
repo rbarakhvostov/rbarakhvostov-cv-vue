@@ -1,13 +1,15 @@
 <script setup lang="ts" generic="T extends string">
 defineSlots<{
-  default?: (props: { option: { value: T; label?: string; ariaLabel: string } }) => unknown
-}>()
+  default?: (props: {
+    option: { value: T; label?: string; ariaLabel: string };
+  }) => unknown;
+}>();
 
-const model = defineModel<T>({ required: true })
+const model = defineModel<T>({ required: true });
 
 const { options } = defineProps<{
-  options: readonly { value: T; label?: string; ariaLabel: string }[]
-}>()
+  options: readonly { value: T; label?: string; ariaLabel: string }[];
+}>();
 </script>
 
 <template>

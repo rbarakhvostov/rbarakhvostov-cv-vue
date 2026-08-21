@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { skills } from '../data/skills'
+import { skills } from '../data/skills';
 
 defineProps<{
-  heading: string
-}>()
+  heading: string;
+}>();
 </script>
 
 <template>
@@ -13,7 +13,9 @@ defineProps<{
     </div>
     <div class="skills__rule" />
     <div class="skills__list">
-      <span v-for="skill in skills" :key="skill" class="skills__chip">{{ skill }}</span>
+      <span v-for="skill in skills" :key="skill" class="skills__chip">{{
+        skill
+      }}</span>
     </div>
   </section>
 </template>

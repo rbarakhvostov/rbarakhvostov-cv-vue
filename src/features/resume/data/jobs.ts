@@ -1,11 +1,13 @@
-import type { JobMeta } from '../types'
+import type { JobMeta } from '../types';
 
 export const jobs: readonly JobMeta[] = [
   {
     id: 'alfa',
     company: 'Alfa-Bank',
     period: '2025 -\u00a0',
-    urls: [{ href: 'https://www.alfabank.by', label: 'https://www.alfabank.by' }],
+    urls: [
+      { href: 'https://www.alfabank.by', label: 'https://www.alfabank.by' },
+    ],
     roleKey: 'roleReactNext',
   },
   {
@@ -32,4 +34,4 @@ export const jobs: readonly JobMeta[] = [
     urls: [{ href: 'https://www.epam.com', label: 'https://www.epam.com' }],
     roleKey: 'roleReact',
   },
-]
+];

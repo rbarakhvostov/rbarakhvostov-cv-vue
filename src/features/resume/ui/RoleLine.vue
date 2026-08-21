@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed } from 'vue';
 
-import { splitRoles } from '../utils/splitRoles'
+import { splitRoles } from '../utils/splitRoles';
 
 const { value } = defineProps<{
-  value: string
-}>()
+  value: string;
+}>();
 
-const parts = computed(() => splitRoles(value))
+const parts = computed(() => splitRoles(value));
 </script>
 
 <template>

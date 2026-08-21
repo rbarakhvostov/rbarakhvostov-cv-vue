@@ -1,13 +1,13 @@
 <script setup lang="ts">
-import type { JobMeta } from '../types'
-import RoleLine from './RoleLine.vue'
+import type { JobMeta } from '../types';
+import RoleLine from './RoleLine.vue';
 
 defineProps<{
-  job: JobMeta
-  roleLine: string
-  bullets: readonly string[]
-  isFirst?: boolean
-}>()
+  job: JobMeta;
+  roleLine: string;
+  bullets: readonly string[];
+  isFirst?: boolean;
+}>();
 </script>
 
 <template>
@@ -16,7 +16,9 @@ defineProps<{
       <h4 class="job__company">{{ job.company }}</h4>
       <div class="job__period">{{ job.period }}</div>
       <div class="job__urls">
-        <a v-for="url in job.urls" :key="url.href" :href="url.href">{{ url.label }}</a>
+        <a v-for="url in job.urls" :key="url.href" :href="url.href">{{
+          url.label
+        }}</a>
       </div>
     </div>
     <div class="job__body">

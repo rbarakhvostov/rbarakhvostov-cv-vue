@@ -40,3 +40,23 @@ npm run dev
 ```sh
 npm run build
 ```
+
+### Lint and Format
+
+```sh
+npm run lint
+npm run lint:css
+npm run format
+```
+
+### Unit Tests
+
+```sh
+npm run test
+```
+
+Run once (CI):
+
+```sh
+npm run test:run
+```

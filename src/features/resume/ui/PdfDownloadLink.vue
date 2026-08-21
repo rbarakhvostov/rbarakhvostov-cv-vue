@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed } from 'vue';
 
-import { getPdfAsset } from '../data/pdf'
-import type { Locale } from '../types'
+import { getPdfAsset } from '../data/pdf';
+import type { Locale } from '../types';
 
 const { locale } = defineProps<{
-  locale: Locale
-}>()
+  locale: Locale;
+}>();
 
-const asset = computed(() => getPdfAsset(locale))
+const asset = computed(() => getPdfAsset(locale));
 </script>
 
 <template>

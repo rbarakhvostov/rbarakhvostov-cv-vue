@@ -1,19 +1,23 @@
 <script setup lang="ts">
-import { useResumeLocale } from '../composables/useResumeLocale'
-import ExperienceSection from './ExperienceSection.vue'
-import ResumeHeader from './ResumeHeader.vue'
-import ResumeSummary from './ResumeSummary.vue'
-import ResumeToolbar from './ResumeToolbar.vue'
-import SkillsSection from './SkillsSection.vue'
+import { useResumeLocale } from '../composables/useResumeLocale';
+import ExperienceSection from './ExperienceSection.vue';
+import ResumeHeader from './ResumeHeader.vue';
+import ResumeSummary from './ResumeSummary.vue';
+import ResumeToolbar from './ResumeToolbar.vue';
+import SkillsSection from './SkillsSection.vue';
 
-const { locale, copy } = useResumeLocale()
+const { locale, copy } = useResumeLocale();
 </script>
 
 <template>
   <div class="page">
     <div class="page__inner">
       <ResumeToolbar />
-      <ResumeHeader :name="copy.name" :role-line="copy.roleLine" :locale="locale" />
+      <ResumeHeader
+        :name="copy.name"
+        :role-line="copy.roleLine"
+        :locale="locale"
+      />
       <ResumeSummary :summary="copy.summary" />
       <ExperienceSection :copy="copy" />
       <SkillsSection :heading="copy.skillsHeading" />

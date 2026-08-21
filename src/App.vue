@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import ResumePage from '@/features/resume/ui/ResumePage.vue'
+import ResumePage from '@/features/resume/ui/ResumePage.vue';
 </script>
 
 <template>
