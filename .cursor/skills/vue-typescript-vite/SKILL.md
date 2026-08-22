@@ -158,6 +158,21 @@ export function usePointer(target: MaybeRefOrGetter<HTMLElement | null>) {
 
 ## Quality bar before finishing a change
 
+After editing source files, run the repo checks and fix failures before considering the task done:
+
+```bash
+npm run format
+npm run lint
+npm run lint:css
+npm run type-check
+npm run test:run
+```
+
+- Run `format` first (`prettier --write .`) so lint and the rest see formatted files.
+- Use `test:run`, not `npm test` — otherwise Vitest stays in watch mode.
+- Run `lint:css` when CSS or `<style>` in Vue files changed. Run `lint` and `type-check` for any TS/Vue change.
+- If a check fails, fix the cause and re-run the failed command. Do not finish until the checks pass.
+
 - [ ] SFC uses `<script setup lang="ts">` with typed props/emits
 - [ ] No `any`, no unused reactive state, no prop mutation
 - [ ] Composables clean up subscriptions
@@ -165,6 +180,7 @@ export function usePointer(target: MaybeRefOrGetter<HTMLElement | null>) {
 - [ ] New routes are lazy-loaded; new env vars are typed
 - [ ] Styles are scoped (or existing global strategy)
 - [ ] Types pass (`vue-tsc`); tests added for non-trivial logic
+- [ ] `format`, `lint`, `lint:css` (if styles changed), `type-check`, and `test:run` have been run and pass
 
 ## Additional resources
 
