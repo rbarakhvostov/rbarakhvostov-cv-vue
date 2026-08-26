@@ -52,5 +52,10 @@ export const skills: readonly string[] = [
   'Agile',
   'Scrum',
   'Kanban',
-  'AI tools (Claude Code, Kilo Code, Cursor)',
+  'Claude Code',
+  'Cursor',
+  'GitHub Copilot',
+  'Kilo Code',
+  'DeepSeek',
+  'ChatGPT',
 ];
