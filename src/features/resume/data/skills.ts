@@ -41,6 +41,7 @@ export const skills: readonly string[] = [
   'GraphQL',
   'Webpack',
   'Vite',
+  'Vitest',
   'WebSocket',
   'SSE',
   'Git',
