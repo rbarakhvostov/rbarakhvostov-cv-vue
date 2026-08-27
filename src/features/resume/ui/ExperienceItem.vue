@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { JobMeta } from '../types';
+import { splitPercents } from '../utils/splitPercents';
 import RoleLine from './RoleLine.vue';
 
 defineProps<{
@@ -24,7 +25,17 @@ defineProps<{
     <div class="job__body">
       <RoleLine class="job__role" :value="roleLine" />
       <ul class="job__bullets">
-        <li v-for="bullet in bullets" :key="bullet">{{ bullet }}</li>
+        <li v-for="bullet in bullets" :key="bullet">
+          <template
+            v-for="(part, partIndex) in splitPercents(bullet)"
+            :key="`${part.text}-${partIndex}`"
+          >
+            <span v-if="part.isPercent" class="job__percent">{{
+              part.text
+            }}</span>
+            <template v-else>{{ part.text }}</template>
+          </template>
+        </li>
       </ul>
     </div>
   </article>
@@ -116,6 +127,11 @@ defineProps<{
   position: relative;
   padding-left: 20px;
   text-wrap: pretty;
+}
+
+.job__percent {
+  color: var(--color-accent);
+  font-weight: 600;
 }
 
 .job__bullets li::before {

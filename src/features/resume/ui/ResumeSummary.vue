@@ -1,31 +1,30 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-const RS_SCHOOL = 'RS School';
+import { splitSummary } from '../utils/splitSummary';
 
 const { summary } = defineProps<{
   summary: string;
 }>();
 
-const parts = computed(() => {
-  const index = summary.indexOf(RS_SCHOOL);
-
-  if (index === -1) {
-    return { pre: summary, post: '' };
-  }
-
-  return {
-    pre: summary.slice(0, index),
-    post: summary.slice(index + RS_SCHOOL.length),
-  };
-});
+const parts = computed(() => splitSummary(summary));
 </script>
 
 <template>
   <p class="summary">
-    {{ parts.pre
-    }}<a href="https://rs.school/" target="_blank" rel="noopener">RS School</a
-    >{{ parts.post }}
+    <template v-for="(part, index) in parts" :key="`${part.kind}-${index}`">
+      <span v-if="part.kind === 'highlight'" class="summary__highlight">{{
+        part.text
+      }}</span>
+      <a
+        v-else-if="part.kind === 'link'"
+        href="https://rs.school/"
+        target="_blank"
+        rel="noopener"
+        >{{ part.text }}</a
+      >
+      <template v-else>{{ part.text }}</template>
+    </template>
   </p>
 </template>
 
@@ -37,6 +36,11 @@ const parts = computed(() => {
   font-size: clamp(14.5px, 1.7vw, 16.5px);
   line-height: 1.65;
   text-wrap: pretty;
+}
+
+.summary__highlight {
+  color: var(--color-accent);
+  font-weight: 600;
 }
 
 .summary a {

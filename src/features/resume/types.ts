@@ -43,6 +43,18 @@ export type RolePart = {
   showSep: boolean;
 };
 
+export type PercentPart = {
+  text: string;
+  isPercent: boolean;
+};
+
+export type SummaryPartKind = 'text' | 'highlight' | 'link';
+
+export type SummaryPart = {
+  kind: SummaryPartKind;
+  text: string;
+};
+
 export type PdfAsset = {
   href: string;
   fileName: string;
