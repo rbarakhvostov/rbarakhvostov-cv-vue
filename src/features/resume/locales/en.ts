@@ -16,15 +16,15 @@ export const en: ResumeCopy = {
   darkLabel: 'Dark',
   jobs: {
     alfa: [
-      'Created an applications specifically designed for bank operators and participated in CRM development. The applications have made the work of bank employees easier by more than 50%',
-      'Collaborated with backend developers, UX/UI designers, BA and QA to implement and integrate complex financial features, ensuring seamless functionality and a cohesive user interface for banking applications. This increased user satisfaction by 60%',
+      'Developed a custom platform for bank operators, reducing operational overhead by over 50% and significantly accelerating client request processing',
+      'Partnered with backend developers, UX/UI designers, business analysts, and QA engineers to deliver and integrate complex financial features, ensuring seamless functionality and a cohesive interface, driving a 80% increase in user satisfaction',
       'Developed and discussed applications architecture',
       'Conducted code reviews, fostering a collaborative and innovative development environment, while ensuring code quality, best practices, and adherence to coding standards',
       'Actively used AI tools to improve development process and code quality',
     ],
     senla: [
-      'Created an applications specifically designed for bank operators and participated in CRM development. The applications have made the work of bank employees easier by more than 50%',
-      'Collaborated with backend developers, UX/UI designers, BA and QA to implement and integrate complex financial features, ensuring seamless functionality and a cohesive user interface for banking applications. This increased user satisfaction by 60%',
+      'Created an application specifically designed for bank operators and participated in CRM development. The applications have made the work of bank employees easier by more than 50%',
+      'Collaborated with backend developers, UX/UI designers, BA and QA to implement and integrate complex financial features, ensuring seamless functionality and a cohesive user interface for banking applications. This increased user satisfaction by 70%',
       'Developed and discussed applications architecture',
       'Wrote unit and integration tests',
       'Conducted code reviews, fostering a collaborative and innovative development environment, while ensuring code quality, best practices, and adherence to coding standards',
@@ -32,8 +32,8 @@ export const en: ResumeCopy = {
       'Actively participated in Scrum ceremonies',
     ],
     gp: [
-      'Created a visually appealing and intuitive user interface for the messaging platform, resulting in enhanced user engagement and satisfaction by 20%',
-      'Translated design mockups into functional and responsive front-end components, ensuring consistency between design and implementation. This improved the app’s user experience by 15%',
+      'Created a visually appealing and intuitive user interface for the messaging platform, resulting in enhanced user engagement and satisfaction by 50%',
+      'Translated design mockups into functional and responsive front-end components, ensuring consistency between design and implementation. This improved the app’s user experience by 50%',
       'Ensured a consistent user experience across various devices by implementing responsive design principles, allowing users to access and use the application on desktops, tablets, and mobile devices',
       'Actively participated in Scrum ceremonies',
     ],
