@@ -182,12 +182,24 @@ npm run format
 npm run lint
 npm run lint:css
 npm run type-check
-npm run test:run
+npm run test
 ```
 
-`npm test` запускает Vitest в watch-режиме. Для одного прогона (и для CI) используйте `test:run`.
+Тесты:
 
-Перед коммитом Husky вызывает lint-staged: Prettier для всех файлов, Stylelint для CSS/Vue, ESLint, `vue-tsc` и связанные тесты для TypeScript/Vue.
+| Скрипт                  | Что делает                                  |
+| ----------------------- | ------------------------------------------- |
+| `npm test`              | один прогон (`vitest run`)                  |
+| `npm run test:watch`    | watch-режим                                 |
+| `npm run test:coverage` | прогон с покрытием (терминал + `coverage/`) |
+
+Перед коммитом Husky запускает:
+
+1. **lint-staged** — только по staged-файлам: Prettier для всех, Stylelint для CSS/Vue, ESLint для TypeScript/Vue;
+2. **`npm run type-check`** — весь проект (`vue-tsc --build`);
+3. **`npm test`** — весь сьют.
+
+Type-check и тесты специально не в lint-staged: это проверки всего проекта, а не отдельных путей.
 
 ## Как править контент
 

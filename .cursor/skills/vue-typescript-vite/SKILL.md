@@ -165,13 +165,18 @@ npm run format
 npm run lint
 npm run lint:css
 npm run type-check
-npm run test:run
+npm run test
 ```
 
 - Run `format` first (`prettier --write .`) so lint and the rest see formatted files.
-- Use `test:run`, not `npm test` — otherwise Vitest stays in watch mode.
+- `test` is a single run (`vitest run`) — use it in CI, pre-commit, and before finishing. `test:watch` is watch mode. `test:coverage` writes a v8 report to the terminal and `coverage/`.
 - Run `lint:css` when CSS or `<style>` in Vue files changed. Run `lint` and `type-check` for any TS/Vue change.
 - If a check fails, fix the cause and re-run the failed command. Do not finish until the checks pass.
+
+Husky pre-commit is `lint-staged --concurrent false && npm run type-check && npm run test`:
+
+- **lint-staged** is file-scoped: Prettier on all staged files, Stylelint on CSS/Vue, ESLint on TypeScript/Vue.
+- **type-check** and **test** are project-wide. Do not put them in lint-staged (`vue-tsc` and the suite ignore staged-path lists).
 
 - [ ] SFC uses `<script setup lang="ts">` with typed props/emits
 - [ ] No `any`, no unused reactive state, no prop mutation
@@ -180,7 +185,7 @@ npm run test:run
 - [ ] New routes are lazy-loaded; new env vars are typed
 - [ ] Styles are scoped (or existing global strategy)
 - [ ] Types pass (`vue-tsc`); tests added for non-trivial logic
-- [ ] `format`, `lint`, `lint:css` (if styles changed), `type-check`, and `test:run` have been run and pass
+- [ ] `format`, `lint`, `lint:css` (if styles changed), `type-check`, and `test` have been run and pass
 
 ## Additional resources
 
