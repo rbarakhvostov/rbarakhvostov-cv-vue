@@ -3,7 +3,7 @@ import { computed, ref } from 'vue';
 import type { Theme } from '../types';
 
 const STORAGE_KEY = 'rb-resume-theme';
-const DEFAULT_THEME: Theme = 'light';
+const DEFAULT_THEME: Theme = 'dark';
 
 const theme = ref<Theme>(DEFAULT_THEME);
 

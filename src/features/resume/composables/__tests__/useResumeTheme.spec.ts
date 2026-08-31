@@ -7,7 +7,7 @@ const STORAGE_KEY = 'rb-resume-theme';
 function resetThemeState(): void {
   localStorage.clear();
   document.documentElement.removeAttribute('data-theme');
-  useResumeTheme().setTheme('light');
+  useResumeTheme().setTheme('dark');
   localStorage.clear();
 }
 
@@ -21,9 +21,7 @@ describe('useResumeTheme', () => {
     resetThemeState();
   });
 
-  it('initResumeTheme applies a stored theme', () => {
-    localStorage.setItem(STORAGE_KEY, 'dark');
-
+  it('defaults to dark when nothing is stored', () => {
     initResumeTheme();
 
     const { theme, isDark, isLight } = useResumeTheme();
@@ -33,36 +31,48 @@ describe('useResumeTheme', () => {
     expect(document.documentElement.dataset.theme).toBe('dark');
   });
 
-  it('falls back to light when stored value is invalid', () => {
+  it('initResumeTheme applies a stored theme', () => {
+    localStorage.setItem(STORAGE_KEY, 'light');
+
+    initResumeTheme();
+
+    const { theme, isDark, isLight } = useResumeTheme();
+    expect(theme.value).toBe('light');
+    expect(isDark.value).toBe(false);
+    expect(isLight.value).toBe(true);
+    expect(document.documentElement.dataset.theme).toBe('light');
+  });
+
+  it('falls back to dark when stored value is invalid', () => {
     localStorage.setItem(STORAGE_KEY, 'neon');
 
     initResumeTheme();
 
     const { theme } = useResumeTheme();
-    expect(theme.value).toBe('light');
-    expect(document.documentElement.dataset.theme).toBe('light');
+    expect(theme.value).toBe('dark');
+    expect(document.documentElement.dataset.theme).toBe('dark');
   });
 
   it('setTheme applies the theme and persists it', () => {
     const { setTheme, theme, isDark } = useResumeTheme();
 
-    setTheme('dark');
+    setTheme('light');
 
-    expect(theme.value).toBe('dark');
-    expect(isDark.value).toBe(true);
-    expect(document.documentElement.dataset.theme).toBe('dark');
-    expect(localStorage.getItem(STORAGE_KEY)).toBe('dark');
+    expect(theme.value).toBe('light');
+    expect(isDark.value).toBe(false);
+    expect(document.documentElement.dataset.theme).toBe('light');
+    expect(localStorage.getItem(STORAGE_KEY)).toBe('light');
   });
 
-  it('falls back to light when reading storage throws', () => {
+  it('falls back to dark when reading storage throws', () => {
     vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
       throw new Error('blocked');
     });
 
     initResumeTheme();
 
-    expect(useResumeTheme().theme.value).toBe('light');
-    expect(document.documentElement.dataset.theme).toBe('light');
+    expect(useResumeTheme().theme.value).toBe('dark');
+    expect(document.documentElement.dataset.theme).toBe('dark');
   });
 
   it('still applies the theme when writing storage throws', () => {
