@@ -2,6 +2,8 @@
 
 [![Netlify Status](https://api.netlify.com/api/v1/badges/9edffeed-0343-45c7-9e4f-95e744494298/deploy-status)](https://app.netlify.com/projects/roman-barakhvostov-cv/deploys)
 
+Приложение: [https://roman-barakhvostov-cv.netlify.app/](https://roman-barakhvostov-cv.netlify.app/)
+
 Одностраничное приложение-резюме: шапка с именем, ролью и контактами, краткое summary, опыт работы, навыки и скачивание PDF — на английском и русском.
 
 Стек: **Vue 3.5** (Composition API, `<script setup>`), **TypeScript** (strict), **Vite 8**. Состояние локали и темы живёт в composable-ах, данные резюме — в статичных модулях, UI собран по фиче `resume`.
