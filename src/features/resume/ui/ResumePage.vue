@@ -6,18 +6,14 @@ import ResumeSummary from './ResumeSummary.vue';
 import ResumeToolbar from './ResumeToolbar.vue';
 import SkillsSection from './SkillsSection.vue';
 
-const { locale, copy } = useResumeLocale();
+const { copy } = useResumeLocale();
 </script>
 
 <template>
   <div class="page">
     <div class="page__inner">
       <ResumeToolbar />
-      <ResumeHeader
-        :name="copy.name"
-        :role-line="copy.roleLine"
-        :locale="locale"
-      />
+      <ResumeHeader :name="copy.name" :role-line="copy.roleLine" />
       <ResumeSummary :summary="copy.summary" />
       <ExperienceSection :copy="copy" />
       <SkillsSection :heading="copy.skillsHeading" />

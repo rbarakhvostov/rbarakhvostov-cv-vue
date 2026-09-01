@@ -6,6 +6,7 @@ import SegmentedToggle from '@/components/SegmentedToggle.vue';
 import { useResumeLocale } from '../composables/useResumeLocale';
 import { useResumeTheme } from '../composables/useResumeTheme';
 import type { Locale, Theme } from '../types';
+import PdfDownloadLink from './PdfDownloadLink.vue';
 
 const { locale, setLocale, copy } = useResumeLocale();
 const { theme, setTheme } = useResumeTheme();
@@ -30,6 +31,9 @@ const themeOptions = computed(
 
 <template>
   <div class="toolbar" data-print-hide>
+    <div class="toolbar__group">
+      <PdfDownloadLink :locale="locale" />
+    </div>
     <div class="toolbar__group">
       <SegmentedToggle
         :model-value="locale"
@@ -85,7 +89,7 @@ const themeOptions = computed(
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
   gap: 10px;
   margin-bottom: clamp(18px, 3vw, 26px);
 }

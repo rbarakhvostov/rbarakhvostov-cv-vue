@@ -47,11 +47,10 @@ const asset = computed(() => getPdfAsset(locale));
   justify-content: center;
   gap: 6px;
   height: 34px;
-  margin-top: -6px;
-  padding: 0 12px;
-  border: 1px solid var(--color-divider);
-  border-radius: var(--radius-md);
-  background: color-mix(in srgb, var(--color-accent) 10%, transparent);
+  padding: 0 10px;
+  border: 0;
+  border-radius: calc(var(--radius-md) - 2px);
+  background: color-mix(in srgb, var(--color-accent) 16%, transparent);
   color: var(--color-role);
   font-size: 12.5px;
   letter-spacing: 0.04em;
@@ -59,7 +58,7 @@ const asset = computed(() => getPdfAsset(locale));
 }
 
 .pdf-link:hover {
-  background: color-mix(in srgb, var(--color-accent) 18%, transparent);
+  background: color-mix(in srgb, var(--color-text) 7%, transparent);
   color: var(--color-role);
 }
 

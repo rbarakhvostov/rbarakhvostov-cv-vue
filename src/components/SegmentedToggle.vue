@@ -33,8 +33,6 @@ const { options } = defineProps<{
 .segmented {
   display: flex;
   align-items: center;
-  overflow: hidden;
-  border-radius: calc(var(--radius-md) - 2px);
 }
 
 .segmented__btn {
@@ -56,8 +54,17 @@ const { options } = defineProps<{
   cursor: pointer;
 }
 
-.segmented__btn + .segmented__btn {
-  border-left: 1px solid var(--color-divider);
+.segmented__btn:first-child {
+  border-radius: calc(var(--radius-md) - 2px) 0 0 calc(var(--radius-md) - 2px);
+}
+
+.segmented__btn:last-child {
+  border-radius: 0 calc(var(--radius-md) - 2px) calc(var(--radius-md) - 2px) 0;
+}
+
+.segmented__btn:focus-visible {
+  position: relative;
+  z-index: 1;
 }
 
 .segmented__btn.is-on {

@@ -1,23 +1,17 @@
 <script setup lang="ts">
 import { contacts } from '../data/contacts';
-import type { Locale } from '../types';
-import PdfDownloadLink from './PdfDownloadLink.vue';
 import RoleLine from './RoleLine.vue';
 
 defineProps<{
   name: string;
   roleLine: string;
-  locale: Locale;
 }>();
 </script>
 
 <template>
   <header class="header">
     <div class="header__main">
-      <div class="header__title-row">
-        <h1 class="header__name">{{ name }}</h1>
-        <PdfDownloadLink :locale="locale" />
-      </div>
+      <h1 class="header__name">{{ name }}</h1>
       <RoleLine class="header__roles" :value="roleLine" />
       <div class="header__contacts">
         <template v-for="(contact, index) in contacts" :key="contact.href">
@@ -41,13 +35,6 @@ defineProps<{
 .header__main {
   flex: 1 1 420px;
   min-width: 260px;
-}
-
-.header__title-row {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 12px;
 }
 
 .header__name {
