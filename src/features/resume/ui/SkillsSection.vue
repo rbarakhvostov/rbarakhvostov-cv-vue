@@ -65,4 +65,16 @@ defineProps<{
   color: var(--chip-fg);
   font-size: 12.5px;
 }
+
+@media screen and (width <= 640px) {
+  .skills__list {
+    gap: 5px;
+  }
+
+  .skills__chip {
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-size: 11px;
+  }
+}
 </style>
