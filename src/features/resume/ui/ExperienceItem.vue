@@ -87,12 +87,12 @@ defineProps<{
 }
 
 .job__urls a {
-  color: var(--color-role);
+  color: color-mix(in srgb, var(--color-text) 55%, transparent);
   font-size: 12.5px;
   font-weight: 500;
   word-break: break-all;
   text-decoration: underline;
-  text-decoration-color: color-mix(in srgb, var(--color-role) 40%, transparent);
+  text-decoration-color: color-mix(in srgb, var(--color-text) 28%, transparent);
 }
 
 .job__urls a:hover {
@@ -142,5 +142,11 @@ defineProps<{
   width: 9px;
   height: 1px;
   background: var(--color-accent);
+}
+
+@media screen and (width <= 640px) {
+  .job {
+    gap: 16px 36px;
+  }
 }
 </style>

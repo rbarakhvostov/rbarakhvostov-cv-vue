@@ -14,7 +14,7 @@ const parts = computed(() => splitRoles(value));
   <div class="role-line">
     <template v-for="part in parts" :key="part.text">
       <span v-if="part.showSep" class="role-line__sep">|</span>
-      <span>{{ part.text }}</span>
+      <span class="role-line__item">{{ part.text }}</span>
     </template>
   </div>
 </template>
@@ -28,5 +28,18 @@ const parts = computed(() => splitRoles(value));
 .role-line__sep {
   margin: 0 8px;
   color: var(--color-divider);
+}
+
+@media screen and (width <= 640px) {
+  .role-line {
+    display: grid;
+    grid-template-columns: repeat(2, auto);
+    gap: 6px 12px;
+    justify-content: start;
+  }
+
+  .role-line__sep {
+    display: none;
+  }
 }
 </style>

@@ -74,4 +74,16 @@ defineProps<{
 .header__sep {
   color: var(--color-divider);
 }
+
+@media screen and (width <= 640px) {
+  .header__contacts {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .header__sep {
+    display: none;
+  }
+}
 </style>
