@@ -25,9 +25,9 @@ describe('ExperienceItem', () => {
 
     expect(
       enWrapper.findAll('.job__percent').map((node) => node.text()),
-    ).toEqual(['50%', '80%']);
+    ).toEqual(['50%', '80%', '50%']);
     expect(
       ruWrapper.findAll('.job__percent').map((node) => node.text()),
-    ).toEqual(['50%', '80%']);
+    ).toEqual(['50%', '80%', '50%']);
   });
 });
