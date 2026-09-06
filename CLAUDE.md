@@ -1,0 +1,149 @@
+# CLAUDE.md
+
+> Зеркало [.cursor/skills/vue-typescript-vite/SKILL.md](.cursor/skills/vue-typescript-vite/SKILL.md) (тот же контент на английском, для Cursor). При изменении правил в одном файле — переносить изменение в другой.
+
+Правила для работы Claude в этом репозитории. Стек: Vue 3.5+, Composition API, TypeScript (strict, `noUncheckedIndexedAccess`), Vite 8, `@` → `src`, `vue-tsc --build` для проверки типов.
+
+Это **статичное одностраничное приложение-резюме** (см. [README.md](README.md)): один экран, без бэкенда, контент — в локальных TS-модулях. Роутера, Pinia и HTTP-клиента здесь намеренно нет — не добавлять их "про запас". Глобальное состояние (локаль, тема) — модульные `ref` внутри composable-ов, персистятся в `localStorage`. Роутер / store / query-библиотеку / VueUse / HTTP-обёртку добавлять только когда для этого появится реальная задача, и сначала пробовать самое простое решение.
+
+## Обязательные правила
+
+- Только **Composition API** с `<script setup lang="ts">`. Не использовать Options API, mixins, filters, class components.
+- TypeScript **strict**. Никогда не использовать `any`. Предпочитать `unknown` + сужение типов. Не добавлять `// @ts-ignore` или `as any`.
+- Для проверки типов использовать `vue-tsc`, а не `tsc`. Не ослаблять `tsconfig` (`strict`, `noUncheckedIndexedAccess`, path aliases).
+- Группировать код по **фичам** по мере роста приложения, не сваливать всё в `components/` и `views/`.
+- Компоненты — маленькие и однозадачные. Переиспользуемую логику выносить в composables (`useXxx`).
+- Не хранить секреты в `VITE_*` env-переменных — они попадают в клиентский бандл.
+
+## Стек по умолчанию
+
+Сейчас установлено и используется:
+
+| Что                             | Выбор                                                                                                                        |
+| ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| UI-компоненты                   | SFC, Composition API, типизированные props/emits                                                                             |
+| Общая логика                    | Composables (`src/features/<name>/composables`)                                                                              |
+| Глобальное клиентское состояние | Модульные `ref`/`computed` внутри composable (`useResumeLocale`, `useResumeTheme`), персист в `localStorage` через try/catch |
+| Юнит-тесты                      | Vitest + Vue Test Utils                                                                                                      |
+| Lint / format                   | ESLint 10 flat config (`typescript-eslint` + `eslint-plugin-vue`) + Prettier                                                 |
+| CSS                             | Scoped SFC-стили + CSS-переменные (`assets/styles/tokens.css`, `base.css`)                                                   |
+
+Не установлено — не добавлять "про запас"; вносить только под реальную задачу, сначала пробовать самое простое:
+
+| Что                              | Если реально понадобится                                                             |
+| -------------------------------- | ------------------------------------------------------------------------------------ |
+| Несколько роутов                 | Vue Router + типизированные роуты (`unplugin-vue-router`)                            |
+| Состояние, переросшее composable | Pinia setup store                                                                    |
+| Удалённые данные с кэшем         | TanStack Vue Query (или Pinia Colada). Не кэшировать HTTP в Pinia                    |
+| HTTP-запросы                     | `ofetch` или нативный `fetch` с типизированными обёртками, не нетипизированный axios |
+| DOM/lifecycle/browser-хелперы    | VueUse — не переизобретать их                                                        |
+| E2E-покрытие                     | Playwright                                                                           |
+| DOM-ассерты сверх Vue Test Utils | Testing Library                                                                      |
+| Utility-first CSS                | Tailwind/UnoCSS, только если проект их примет                                        |
+
+Не добавлять Vuex, Vetur, webpack, runtime `PropTypes`.
+
+## Структура файлов
+
+Актуальная текущая раскладка — ориентироваться на неё для нового кода, не придумывать `router/`, `stores/` или top-level `composables/`/`types/`, пока в проекте реально не появится второй роут или настоящий кросс-фичевый стор:
+
+```
+src/
+  assets/styles/           # tokens.css, base.css
+  components/              # общие презентационные компоненты (без логики фичи)
+  features/<name>/         # модуль фичи
+    composables/           # composables фичи (+ __tests__)
+    data/                  # статичные модули с контентом (без Vue API)
+    locales/               # переводы по локалям
+    ui/                    # компоненты фичи (+ __tests__)
+    utils/                 # чистые функции (+ __tests__)
+    types.ts               # общие типы фичи
+  App.vue
+  main.ts
+```
+
+- Импорт через `@/` (`@/features/resume/data/jobs`).
+- Один компонент — один файл. Имя файла = имя компонента (`ResumeHeader.vue`).
+- Composables: `useResumeLocale.ts`. Если когда-нибудь появится стор: `useXxxStore.ts`.
+- В `data/` и `utils/` не должно быть Vue-реактивности. Если нужен `ref`/lifecycle — это composable.
+- Тесты лежат рядом с тем, что проверяют, в `__tests__/`.
+
+## Правила для SFC
+
+Порядок блоков: `<script setup lang="ts">`, затем `<template>`, затем `<style scoped>`.
+
+- Типизированные `defineProps` / `defineEmits`. Предпочитать `defineModel` для `v-model`.
+- Vue 3.5+: деструктуризация `defineProps()` реактивна — не оборачивать эти поля в `toRefs` без необходимости.
+- Использовать `useTemplateRef<HTMLInputElement>('input')` вместо `ref()` + типизации `ref="input"`.
+- Типизировать слоты через `defineSlots`. `defineExpose` — только если родителю действительно нужно вызывать методы.
+- У `v-for` всегда стабильный `:key` (id, не индекс, кроме статичных списков).
+- Никогда не использовать `v-html` с недоверенным контентом.
+- Предпочитать семантический HTML и нативные элементы. ARIA — только если нативной семантики недостаточно.
+
+## Реактивность и script setup
+
+- `ref` для примитивов и заменяемых значений. `reactive` — только для целостного объектного состояния, которое не переприсваивается целиком.
+- Не деструктурировать `reactive()`-объект без `toRefs`/`toRef`.
+- Производные значения → `computed`, а не `watch`, который пишет в другой ref.
+- Побочные эффекты → `watch`/`watchEffect` с явной очисткой. Предпочитать `{ once: true }` или `watchEffect` + `onScopeDispose`.
+- В composables принимать `MaybeRefOrGetter<T>`, читать через `toValue()`.
+- `shallowRef`/`shallowReactive` для больших деревьев или сторонних инстансов (графики, карты, редакторы).
+- Не хранить реактивное состояние в `utils/`. Не мутировать props.
+
+## Composables
+
+- Имя: `useXxx`. Возвращать **именованный объект**, а не позиционный кортеж (кроме устоявшихся API вида `[state, setState]`).
+- Регистрировать листенеры, интервалы, observers с очисткой на `onScopeDispose`.
+- Держать composables framework-agnostic на границах: принимать refs/getters, возвращать refs/computed.
+- Не создавать composable, который используется один раз и не даёт переиспользования/тестируемости — оставить логику в компоненте.
+
+## Состояние, роутинг, данные
+
+- **Локальное UI-состояние** — в компоненте.
+- **Небольшое глобальное клиентское состояние** (локаль, тема, ...) → модульные `ref`/`computed` внутри composable, экспортированные как синглтон (см. `useResumeLocale`, `useResumeTheme`). Все вызовы разделяют один и тот же экземпляр. Чтение/запись `localStorage` оборачивать в try/catch с разумным значением по умолчанию (приватный режим может бросить исключение).
+- Роутера нет: приложение — один экран (`App.vue` → `ResumePage`). Не добавлять Vue Router ради одной страницы.
+- Если кросс-фичевое состояние реально перерастёт composable (много независимых потребителей, сложные производные значения) — поднимать его до Pinia setup store, а не растить ad-hoc модульный синглтон.
+- Серверных данных нет: контент — статичные TS-модули в `features/<name>/data/`. Если приложение когда-нибудь начнёт получать удалённые данные — кэш держать через query-библиотеку, а не ручным fetch+кэш в composable или сторе.
+- Bootstrap приложения в `main.ts`: сначала side-effect инициализации, которые должны отработать до первой отрисовки (`initResumeTheme()`, `initResumeLocale()`) → `createApp(App).mount('#app')`. Вызовы `app.use(...)` добавлять только когда реально появится плагин (роутер, Pinia и т.п.).
+
+## Vite и TypeScript
+
+- Env: наружу торчит только `VITE_*`. Сейчас кастомных env-переменных нет (используется только встроенная `import.meta.env.BASE_URL` в `data/pdf.ts`). При добавлении — типизировать в `env.d.ts` через `ImportMetaEnv`. Доступ через `import.meta.env`, никогда не через `process.env`.
+- Держать alias `@` синхронизированным в `vite.config.ts` и `tsconfig.app.json`.
+- Использовать `import type { Foo } from '...'` для type-only импортов.
+- Предпочитать официальные Vite-плагины. Не добавлять webpack-era loaders или `vite-plugin-vue2`.
+- Тяжёлые виджеты (если появятся) разбивать через `() => import(...)` или `defineAsyncComponent`.
+- Продакшн-проверка: `npm run build` должен проходить `vue-tsc --build` и сборку Vite.
+
+## Планка качества перед завершением задачи
+
+После правок исходников — прогнать проверки и исправить ошибки до завершения задачи:
+
+```bash
+npm run format
+npm run lint
+npm run lint:css
+npm run type-check
+npm run test
+```
+
+- Сначала `format` (`prettier --write .`), чтобы lint и остальное видели отформатированные файлы.
+- `test` — одиночный прогон (`vitest run`), используется в CI, pre-commit и перед завершением. `test:watch` — watch-режим. `test:coverage` пишет v8-отчёт в терминал и `coverage/`.
+- `lint:css` запускать при изменении CSS или `<style>` в Vue-файлах. `lint` и `type-check` — при любом TS/Vue изменении.
+- Если проверка падает — исправить причину и перезапустить именно эту проверку. Не завершать задачу, пока проверки не проходят.
+
+Husky pre-commit: `lint-staged --concurrent false && npm run type-check && npm run test`:
+
+- **lint-staged** работает по файлам: Prettier на всех staged-файлах, Stylelint на CSS/Vue, ESLint на TS/Vue.
+- **type-check** и **test** — общепроектные, их не кладут в lint-staged (`vue-tsc` и тестовый набор игнорируют списки staged-путей).
+
+## Чек-лист перед сдачей изменений
+
+- [ ] SFC использует `<script setup lang="ts">` с типизированными props/emits
+- [ ] Нет `any`, нет неиспользуемого реактивного состояния, нет мутации props
+- [ ] Composables чистят подписки
+- [ ] У списков стабильные ключи; у асинхронной работы есть loading/error/empty состояния
+- [ ] Роутер/Pinia/HTTP-клиент не добавлены без реальной необходимости; новые env-переменные типизированы
+- [ ] Стили scoped (или соответствуют существующей глобальной стратегии)
+- [ ] Типы проходят (`vue-tsc`); для нетривиальной логики добавлены тесты
+- [ ] `format`, `lint`, `lint:css` (если менялись стили), `type-check`, `test` — запущены и проходят

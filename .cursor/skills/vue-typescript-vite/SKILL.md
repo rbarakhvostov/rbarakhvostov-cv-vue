@@ -5,9 +5,13 @@ description: Apply Vue 3 Composition API, TypeScript, and Vite best practices wh
 
 # Vue + TypeScript + Vite
 
+> Mirrored in [CLAUDE.md](../../../CLAUDE.md) (same content in Russian, for Claude Code). When editing rules here, port the change there too.
+
 Follow these practices for all Vue 3 + TypeScript + Vite work in this repo. Prefer current Vue 3 APIs over Vue 2 / Options API patterns.
 
 This project is Vue 3.5+, Vite 8, TypeScript (strict, `noUncheckedIndexedAccess`), `@` → `src`, and `vue-tsc --build` for type-checking. Match that stack.
+
+This is a **static, single-page resume app** (see `README.md`): one route, no backend, content lives in local TS modules. Deliberately no router, no Pinia, no HTTP client — don't reintroduce them speculatively. Global state (locale, theme) is module-scope `ref`s inside composables, persisted to `localStorage`. Only add a router / store / query library / VueUse / HTTP wrapper when a real requirement needs it, and prefer the smallest solution first.
 
 ## Non-negotiables
 
@@ -20,44 +24,56 @@ This project is Vue 3.5+, Vite 8, TypeScript (strict, `noUncheckedIndexedAccess`
 
 ## Default stack
 
-Use these unless the project already chose otherwise:
+Currently installed and in use:
 
 | Concern | Choice |
 |---|---|
 | UI components | SFCs, Composition API, typed props/emits |
-| Shared logic | Composables (`src/composables` or `src/features/<name>`) |
-| Client state | Pinia setup stores |
-| Server state | TanStack Vue Query (or Pinia Colada). Do not cache HTTP in Pinia. |
-| Routing | Vue Router + typed routes (`unplugin-vue-router` when adding routes) |
-| HTTP | `ofetch` or native `fetch` with typed wrappers. No untyped axios bag. |
-| Utilities | VueUse for DOM/lifecycle/browser primitives. Do not reimplement them. |
-| Unit tests | Vitest + Vue Test Utils + Testing Library |
-| E2E | Playwright |
-| Lint / format | ESLint 9 flat config (`typescript-eslint` + `eslint-plugin-vue`) + Prettier or Oxfmt |
-| CSS | Scoped SFC styles + CSS variables. Tailwind/UnoCSS only if already in the project. |
+| Shared logic | Composables (`src/features/<name>/composables`) |
+| Global client state | Module-scope `ref`/`computed` inside a composable (e.g. `useResumeLocale`, `useResumeTheme`), persisted via `localStorage` with try/catch |
+| Unit tests | Vitest + Vue Test Utils |
+| Lint / format | ESLint 10 flat config (`typescript-eslint` + `eslint-plugin-vue`) + Prettier |
+| CSS | Scoped SFC styles + CSS variables (`assets/styles/tokens.css`, `base.css`) |
+
+Not installed — do not add speculatively; bring in only when a real requirement needs it, and prefer the smallest fix first:
+
+| Concern | If actually needed |
+|---|---|
+| Multiple routes | Vue Router + typed routes (`unplugin-vue-router`) |
+| State outgrowing a composable | Pinia setup store |
+| Remote/server data with caching | TanStack Vue Query (or Pinia Colada) — do not cache HTTP in Pinia |
+| HTTP calls | `ofetch` or native `fetch` with typed wrappers, not untyped axios |
+| DOM/lifecycle/browser helpers | VueUse — don't reimplement its primitives |
+| E2E coverage | Playwright |
+| Component-level DOM assertions beyond Vue Test Utils | Testing Library |
+| Utility-first CSS | Tailwind/UnoCSS, only if the project adopts one |
 
 Do not add Vuex, Vetur, webpack, or runtime `PropTypes`.
 
 ## File structure
 
+Actual current layout — match it for new code, don't invent `router/`, `stores/`, or a top-level `composables/`/`types/` unless the project actually grows a second route or a real cross-feature store:
+
 ```
 src/
-  assets/
-  components/          # shared, presentational UI only
-  composables/         # shared composables
-  features/<name>/     # feature module: ui, composables, api, types, store
-  router/
-  stores/              # Pinia stores that are truly global
-  types/
-  utils/               # pure functions, no Vue APIs
+  assets/styles/           # tokens.css, base.css
+  components/              # shared, presentational UI only (no feature logic)
+  features/<name>/         # feature module
+    composables/           # feature-scoped composables (+ __tests__)
+    data/                  # static content modules (no Vue APIs)
+    locales/               # translated copy per locale
+    ui/                    # feature components (+ __tests__)
+    utils/                 # pure functions (+ __tests__)
+    types.ts               # feature's shared types
   App.vue
   main.ts
 ```
 
-- Import via `@/` (`@/features/auth/api`).
-- One component per file. File name = component name (`UserCard.vue`).
-- Composables: `useUserSession.ts`. Stores: `useUserStore.ts`.
-- Keep `utils/` free of Vue reactivity. If it needs `ref` / lifecycle, it is a composable.
+- Import via `@/` (`@/features/resume/data/jobs`).
+- One component per file. File name = component name (`ResumeHeader.vue`).
+- Composables: `useResumeLocale.ts`. If a store is ever introduced: `useXxxStore.ts`.
+- Keep `data/` and `utils/` free of Vue reactivity. If it needs `ref` / lifecycle, it belongs in `composables/`.
+- Tests live next to what they cover, in `__tests__/`.
 
 ## SFC rules
 
@@ -142,18 +158,19 @@ export function usePointer(target: MaybeRefOrGetter<HTMLElement | null>) {
 ## State, routing, data fetching
 
 - **Local UI state** lives in the component.
-- **Cross-component client state** → Pinia setup store (`defineStore('id', () => { ... })`).
-- **Server/async cache** → query library. Stores should not `fetch` and cache lists.
-- Routes are lazy-loaded. Guards are typed. Prefer file-based typed routing when introducing Vue Router.
-- App bootstrap in `main.ts`: create app → `app.use(pinia)` → `app.use(router)` → plugins → `mount`.
+- **Small global client state** (locale, theme, ...) → module-scope `ref`/`computed` in a composable, exported as a singleton (see `useResumeLocale`, `useResumeTheme`). Every call site shares the same instance. Wrap `localStorage` reads/writes in try/catch and fall back to a sane default (private-browsing mode can throw).
+- There is no router: the app is a single screen (`App.vue` → `ResumePage`). Don't add Vue Router for what is still one page.
+- If cross-feature state genuinely outgrows a composable (many independent consumers, complex derived state), promote it to a Pinia setup store instead of growing an ad-hoc module singleton.
+- There is no server data: content is static TS modules under `features/<name>/data/`. If the app ever fetches remote data, use a query library for the cache — don't hand-roll fetch+cache in a composable or store.
+- App bootstrap in `main.ts`: run side-effect inits that must land before first paint (e.g. `initResumeTheme()`, `initResumeLocale()`) → `createApp(App).mount('#app')`. Add `app.use(...)` calls only when a plugin (router, Pinia, etc.) actually exists.
 
 ## Vite and TypeScript
 
-- Env: only `VITE_*` is exposed. Type it in `env.d.ts` via `ImportMetaEnv`. Access through `import.meta.env`, never `process.env`.
+- Env: only `VITE_*` is exposed to the client. No custom env vars exist yet (only built-ins like `import.meta.env.BASE_URL`, used in `data/pdf.ts`). If you add one, type it in `env.d.ts` via `ImportMetaEnv`. Access through `import.meta.env`, never `process.env`.
 - Keep the `@` alias in both `vite.config.ts` and `tsconfig.app.json`.
 - Use `import type { Foo } from '...'` for type-only imports.
 - Prefer official Vite plugins. Do not add webpack-era loaders or `vite-plugin-vue2`.
-- Code-split routes and heavy widgets with `() => import(...)` or `defineAsyncComponent`.
+- Code-split heavy widgets (if any appear) with `() => import(...)` or `defineAsyncComponent`.
 - Production check: `npm run build` must pass `vue-tsc --build` and the Vite build.
 
 ## Quality bar before finishing a change
@@ -182,7 +199,7 @@ Husky pre-commit is `lint-staged --concurrent false && npm run type-check && npm
 - [ ] No `any`, no unused reactive state, no prop mutation
 - [ ] Composables clean up subscriptions
 - [ ] Lists have stable keys; async work has loading/error/empty states
-- [ ] New routes are lazy-loaded; new env vars are typed
+- [ ] No router/Pinia/HTTP client added without a real need; new env vars are typed
 - [ ] Styles are scoped (or existing global strategy)
 - [ ] Types pass (`vue-tsc`); tests added for non-trivial logic
 - [ ] `format`, `lint`, `lint:css` (if styles changed), `type-check`, and `test` have been run and pass
