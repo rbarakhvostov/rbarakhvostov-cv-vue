@@ -43,9 +43,9 @@ export type RolePart = {
   showSep: boolean;
 };
 
-export type PercentPart = {
+export type NumberPart = {
   text: string;
-  isPercent: boolean;
+  isHighlighted: boolean;
 };
 
 export type SummaryPartKind = 'text' | 'highlight' | 'link';
