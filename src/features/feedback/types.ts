@@ -1,0 +1,39 @@
+export type FeedbackStatus = 'idle' | 'sending' | 'success' | 'error';
+
+export type FeedbackErrorReason =
+  'validation' | 'missing-key' | 'network' | 'server';
+
+export type FeedbackFieldErrors = {
+  name: boolean;
+  message: boolean;
+};
+
+export type Web3FormsSubmission = {
+  access_key: string;
+  subject: string;
+  from_name: string;
+  name: string;
+  message: string;
+  botcheck: boolean;
+};
+
+export type Web3FormsResponse = {
+  success: boolean;
+  message: string;
+};
+
+export type FeedbackCopy = {
+  heading: string;
+  subheading: string;
+  nameLabel: string;
+  messageLabel: string;
+  nameRequiredError: string;
+  messageRequiredError: string;
+  sendLabel: string;
+  sendingLabel: string;
+  successMessage: string;
+  networkErrorMessage: string;
+  configErrorMessage: string;
+  serverErrorMessage: string;
+  fallbackLinkLabel: string;
+};

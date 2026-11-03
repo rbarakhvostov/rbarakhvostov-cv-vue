@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import FeedbackForm from '@/features/feedback/ui/FeedbackForm.vue';
+
 import { useResumeLocale } from '../composables/useResumeLocale';
 import ExperienceSection from './ExperienceSection.vue';
 import ResumeHeader from './ResumeHeader.vue';
@@ -17,6 +19,7 @@ const { copy } = useResumeLocale();
       <ResumeSummary :summary="copy.summary" />
       <ExperienceSection :copy="copy" />
       <SkillsSection :heading="copy.skillsHeading" />
+      <FeedbackForm />
     </div>
   </div>
 </template>

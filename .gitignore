@@ -38,3 +38,8 @@ __screenshots__/
 
 # Vite
 *.timestamp-*-*.mjs
+
+# Env vars (local secrets/config — never commit; .env.example is the committed template)
+.env
+.env.*
+!.env.example
