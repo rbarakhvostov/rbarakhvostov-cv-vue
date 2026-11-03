@@ -133,8 +133,8 @@ const bannerMessage = computed(() => {
   margin-top: clamp(40px, 6vw, 64px);
   padding: clamp(24px, 4vw, 36px);
   border-radius: var(--radius-lg);
-  background: var(--color-surface);
-  box-shadow: var(--shadow-sm);
+  background: color-mix(in srgb, var(--color-accent) 6%, var(--color-bg));
+  box-shadow: 0 0 0 1px var(--color-divider);
 }
 
 .feedback__heading {
@@ -193,7 +193,7 @@ const bannerMessage = computed(() => {
   padding: 9px 12px;
   border: 1px solid var(--color-divider);
   border-radius: var(--radius-md);
-  background: color-mix(in srgb, var(--color-text) 4%, transparent);
+  background: var(--color-bg);
   color: var(--color-text);
   font: inherit;
 }
