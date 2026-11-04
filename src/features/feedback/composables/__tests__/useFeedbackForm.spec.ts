@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { nextTick } from 'vue';
 
 import { WEB3FORMS_ENDPOINT } from '../../data/web3forms';
 import { useFeedbackForm } from '../useFeedbackForm';
@@ -105,5 +106,43 @@ describe('useFeedbackForm', () => {
 
     expect(form.status.value).toBe('success');
     expect(fetch).not.toHaveBeenCalled();
+  });
+
+  it('clears a field error once that field becomes valid again', async () => {
+    const form = useFeedbackForm();
+    vi.stubGlobal('fetch', vi.fn());
+
+    await form.submit();
+    expect(form.fieldErrors.value).toEqual({ name: true, message: true });
+
+    form.name.value = 'Ada Lovelace';
+    await nextTick();
+    expect(form.fieldErrors.value).toEqual({ name: false, message: true });
+
+    form.message.value = 'Hello there';
+    await nextTick();
+    expect(form.fieldErrors.value).toEqual({ name: false, message: false });
+  });
+
+  it('treats whitespace as still invalid while clearing', async () => {
+    const form = useFeedbackForm();
+    vi.stubGlobal('fetch', vi.fn());
+
+    await form.submit();
+
+    form.name.value = '   ';
+    await nextTick();
+
+    expect(form.fieldErrors.value.name).toBe(true);
+  });
+
+  it('does not raise new field errors while typing before a submit', async () => {
+    const form = useFeedbackForm();
+
+    form.name.value = 'Ada Lovelace';
+    form.message.value = '';
+    await nextTick();
+
+    expect(form.fieldErrors.value).toEqual({ name: false, message: false });
   });
 });

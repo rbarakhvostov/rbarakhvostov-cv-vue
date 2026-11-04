@@ -1,4 +1,4 @@
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 
 import { buildWeb3FormsPayload, WEB3FORMS_ENDPOINT } from '../data/web3forms';
 import type {
@@ -17,6 +17,22 @@ export function useFeedbackForm() {
   const status = ref<FeedbackStatus>('idle');
   const errorReason = ref<FeedbackErrorReason | null>(null);
   const fieldErrors = ref<FeedbackFieldErrors>({ name: false, message: false });
+
+  // Clear a field's error as soon as it becomes valid again. This only ever
+  // removes errors — typing must not raise new ones before the next submit.
+  watch([name, message], ([nextName, nextMessage]) => {
+    const current = fieldErrors.value;
+
+    if (!current.name && !current.message) {
+      return;
+    }
+
+    const errors = validateFeedback(nextName, nextMessage);
+    fieldErrors.value = {
+      name: current.name && errors.name,
+      message: current.message && errors.message,
+    };
+  });
 
   async function submit(): Promise<void> {
     if (botcheck.value) {
