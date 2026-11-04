@@ -87,12 +87,12 @@ defineProps<{
 }
 
 .job__urls a {
-  color: color-mix(in srgb, var(--color-text) 55%, transparent);
+  color: color-mix(in srgb, var(--color-text) 82%, transparent);
   font-size: 12.5px;
   font-weight: 500;
   word-break: break-all;
   text-decoration: underline;
-  text-decoration-color: color-mix(in srgb, var(--color-text) 28%, transparent);
+  text-decoration-color: color-mix(in srgb, var(--color-text) 45%, transparent);
 }
 
 .job__urls a:hover {
