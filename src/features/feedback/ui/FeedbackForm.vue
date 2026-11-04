@@ -1,11 +1,16 @@
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, ref, useTemplateRef } from 'vue';
 
 import { useResumeLocale } from '@/features/resume/composables/useResumeLocale';
 import { contacts } from '@/features/resume/data/contacts';
 
 import { useFeedbackForm } from '../composables/useFeedbackForm';
 import { getFeedbackCopy } from '../locales';
+import type {
+  FeedbackErrorReason,
+  FeedbackToast as FeedbackToastPayload,
+} from '../types';
+import FeedbackToast from './FeedbackToast.vue';
 
 const { locale } = useResumeLocale();
 const copy = computed(() => getFeedbackCopy(locale.value));
@@ -19,12 +24,9 @@ const mailtoHref = computed(
 const { name, message, botcheck, status, errorReason, fieldErrors, submit } =
   useFeedbackForm();
 
-const bannerMessage = computed(() => {
-  if (status.value !== 'error' || errorReason.value === 'validation') {
-    return null;
-  }
-
-  switch (errorReason.value) {
+// 'validation' stays inline under the offending field, so it maps to null.
+function errorCopyFor(reason: FeedbackErrorReason | null): string | null {
+  switch (reason) {
     case 'missing-key':
       return copy.value.configErrorMessage;
     case 'network':
@@ -34,7 +36,38 @@ const bannerMessage = computed(() => {
     default:
       return null;
   }
-});
+}
+
+const toast = ref<FeedbackToastPayload | null>(null);
+const submitButton = useTemplateRef<HTMLButtonElement>('submit-button');
+
+// `status` never returns to 'idle', so an identical outcome twice in a row is
+// not a reactive change — await the submission instead of watching the status.
+async function onSubmit(): Promise<void> {
+  await submit();
+
+  if (status.value === 'success') {
+    toast.value = { tone: 'success', message: copy.value.successMessage };
+    return;
+  }
+
+  const errorMessage = errorCopyFor(errorReason.value);
+  if (errorMessage) {
+    toast.value = {
+      tone: 'error',
+      message: errorMessage,
+      link: { href: mailtoHref.value, label: copy.value.fallbackLinkLabel },
+    };
+  }
+}
+
+// The toast is teleported to the end of <body>, so its close button is the last
+// focusable node; hand focus back to Send instead of resetting to page top.
+// Only on an explicit close — the timer must never steal focus.
+function onToastClose(): void {
+  toast.value = null;
+  submitButton.value?.focus({ preventScroll: true });
+}
 </script>
 
 <template>
@@ -47,7 +80,7 @@ const bannerMessage = computed(() => {
     <div class="feedback__card">
       <p class="feedback__subheading">{{ copy.subheading }}</p>
 
-      <form class="feedback__form" novalidate @submit.prevent="submit">
+      <form class="feedback__form" novalidate @submit.prevent="onSubmit">
         <label class="feedback__honeypot" aria-hidden="true">
           <input
             v-model="botcheck"
@@ -108,28 +141,22 @@ const bannerMessage = computed(() => {
         </div>
 
         <button
+          ref="submit-button"
           class="feedback__submit"
           type="submit"
           :disabled="status === 'sending'"
         >
           {{ status === 'sending' ? copy.sendingLabel : copy.sendLabel }}
         </button>
-
-        <p
-          v-if="status === 'success'"
-          class="feedback__status feedback__status--success"
-        >
-          {{ copy.successMessage }}
-        </p>
-        <p
-          v-else-if="bannerMessage"
-          class="feedback__status feedback__status--error"
-        >
-          {{ bannerMessage }}
-          <a :href="mailtoHref">{{ copy.fallbackLinkLabel }}</a>
-        </p>
       </form>
     </div>
+
+    <FeedbackToast
+      :toast="toast"
+      :close-label="copy.dismissLabel"
+      @dismiss="toast = null"
+      @close="onToastClose"
+    />
   </section>
 </template>
 
@@ -254,19 +281,5 @@ const bannerMessage = computed(() => {
 
 .feedback__submit:hover:not(:disabled) {
   background: color-mix(in srgb, var(--color-accent) 16%, transparent);
-}
-
-.feedback__status {
-  margin: 0;
-  font-size: 13.5px;
-}
-
-.feedback__status--success {
-  color: var(--color-accent);
-}
-
-.feedback__status--error a {
-  color: var(--color-accent);
-  text-decoration: underline;
 }
 </style>

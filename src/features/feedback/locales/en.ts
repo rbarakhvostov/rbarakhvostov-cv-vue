@@ -17,4 +17,5 @@ export const en: FeedbackCopy = {
   serverErrorMessage:
     'Something went wrong sending your message. Please try again, or email me directly:',
   fallbackLinkLabel: 'rbarakhvostov@gmail.com',
+  dismissLabel: 'Dismiss notification',
 };

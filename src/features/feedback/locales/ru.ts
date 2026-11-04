@@ -17,4 +17,5 @@ export const ru: FeedbackCopy = {
   serverErrorMessage:
     'Не удалось отправить сообщение. Попробуйте ещё раз, либо напишите мне напрямую:',
   fallbackLinkLabel: 'rbarakhvostov@gmail.com',
+  dismissLabel: 'Закрыть уведомление',
 };

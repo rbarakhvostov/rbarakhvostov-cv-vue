@@ -8,6 +8,19 @@ export type FeedbackFieldErrors = {
   message: boolean;
 };
 
+export type FeedbackToastTone = 'success' | 'error';
+
+export type FeedbackToastLink = {
+  href: string;
+  label: string;
+};
+
+export type FeedbackToast = {
+  tone: FeedbackToastTone;
+  message: string;
+  link?: FeedbackToastLink;
+};
+
 export type Web3FormsSubmission = {
   access_key: string;
   subject: string;
@@ -36,4 +49,5 @@ export type FeedbackCopy = {
   configErrorMessage: string;
   serverErrorMessage: string;
   fallbackLinkLabel: string;
+  dismissLabel: string;
 };

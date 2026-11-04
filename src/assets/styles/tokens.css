@@ -6,6 +6,10 @@
   --color-accent-2: #a7a1db;
   --color-divider: color-mix(in srgb, #e9e9ed 16%, transparent);
 
+  /* Toast tones: intentionally identical in both themes. */
+  --color-danger: #ff5c6b;
+  --color-success: #3ddc87;
+
   --color-neutral-100: #f3f5fe;
   --color-neutral-200: #e4e7f5;
   --color-neutral-300: #cfd3e5;
@@ -70,6 +74,7 @@
   --color-text: #292b31;
   --color-accent: #796cbf;
   --color-divider: color-mix(in srgb, #292b31 18%, transparent);
+  --shadow-lg: 0 0 0 1px #cfd3e5, 0 16px 40px rgb(41 43 49 / 16%);
   --chip-bg: var(--color-accent-200);
   --chip-fg: var(--color-accent-800);
   --color-role: var(--color-accent-700);

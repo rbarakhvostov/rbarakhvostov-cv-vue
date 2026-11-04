@@ -1,16 +1,46 @@
-import { mount } from '@vue/test-utils';
+import { flushPromises, mount } from '@vue/test-utils';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import FeedbackForm from '../FeedbackForm.vue';
 
+// The toast teleports into <body>, so it lives outside the wrapper's tree.
+function findToast(): HTMLElement | null {
+  return document.body.querySelector('.feedback-toast');
+}
+
+function mountForm() {
+  return mount(FeedbackForm, { attachTo: document.body });
+}
+
+async function fillAndSubmit(
+  wrapper: ReturnType<typeof mountForm>,
+): Promise<void> {
+  await wrapper.find('#feedback-name').setValue('Ada Lovelace');
+  await wrapper.find('#feedback-message').setValue('Hello there');
+  await wrapper.find('form').trigger('submit');
+  await flushPromises();
+}
+
+function stubSubmitResponse(body: { success: boolean; message: string }): void {
+  vi.stubEnv('VITE_WEB3FORMS_ACCESS_KEY', 'test-key');
+  vi.stubGlobal(
+    'fetch',
+    vi.fn().mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve(body),
+    }),
+  );
+}
+
 afterEach(() => {
   vi.unstubAllGlobals();
   vi.unstubAllEnvs();
+  document.body.innerHTML = '';
 });
 
 describe('FeedbackForm', () => {
   it('renders labeled fields with required markers and a send button', () => {
-    const wrapper = mount(FeedbackForm);
+    const wrapper = mountForm();
 
     expect(wrapper.find('label[for="feedback-name"]').text()).toContain('Name');
     expect(wrapper.find('label[for="feedback-message"]').text()).toContain(
@@ -18,58 +48,74 @@ describe('FeedbackForm', () => {
     );
     expect(wrapper.findAll('.feedback__required')).toHaveLength(2);
     expect(wrapper.find('button[type="submit"]').text()).toBe('Send');
+
+    wrapper.unmount();
   });
 
-  it('shows validation errors and does not call fetch when submitted empty', async () => {
+  it('shows inline validation errors without a toast when submitted empty', async () => {
     vi.stubGlobal('fetch', vi.fn());
-    const wrapper = mount(FeedbackForm);
+    const wrapper = mountForm();
 
     await wrapper.find('form').trigger('submit');
+    await flushPromises();
 
     expect(wrapper.text()).toContain('Please enter your name.');
     expect(wrapper.text()).toContain('Please enter a message.');
     expect(fetch).not.toHaveBeenCalled();
+    expect(findToast()).toBeNull();
+
+    wrapper.unmount();
   });
 
-  it('shows a success message after a successful submit', async () => {
-    vi.stubEnv('VITE_WEB3FORMS_ACCESS_KEY', 'test-key');
-    vi.stubGlobal(
-      'fetch',
-      vi.fn().mockResolvedValue({
-        ok: true,
-        json: () => Promise.resolve({ success: true, message: 'ok' }),
-      }),
-    );
+  it('shows a success toast after a successful submit', async () => {
+    stubSubmitResponse({ success: true, message: 'ok' });
 
-    const wrapper = mount(FeedbackForm);
-    await wrapper.find('#feedback-name').setValue('Ada Lovelace');
-    await wrapper.find('#feedback-message').setValue('Hello there');
-    await wrapper.find('form').trigger('submit');
-    await wrapper.vm.$nextTick();
-    await new Promise((resolve) => setTimeout(resolve, 0));
+    const wrapper = mountForm();
+    await fillAndSubmit(wrapper);
 
-    expect(wrapper.text()).toContain('Thanks! Your message has been sent.');
+    const toast = findToast();
+    expect(toast).not.toBeNull();
+    expect(toast?.classList.contains('feedback-toast--success')).toBe(true);
+    expect(toast?.textContent).toContain('Thanks! Your message has been sent.');
+    // The toast must escape the form's data-print-hide subtree.
+    expect(wrapper.text()).not.toContain('Thanks! Your message has been sent.');
+
+    wrapper.unmount();
   });
 
-  it('shows an error message with a mailto fallback link on server failure', async () => {
-    vi.stubEnv('VITE_WEB3FORMS_ACCESS_KEY', 'test-key');
-    vi.stubGlobal(
-      'fetch',
-      vi.fn().mockResolvedValue({
-        ok: true,
-        json: () => Promise.resolve({ success: false, message: 'bad key' }),
-      }),
+  it('closes the toast and returns focus to Send when × is clicked', async () => {
+    stubSubmitResponse({ success: true, message: 'ok' });
+
+    const wrapper = mountForm();
+    await fillAndSubmit(wrapper);
+
+    document.body
+      .querySelector<HTMLButtonElement>('.feedback-toast__close')
+      ?.click();
+    await flushPromises();
+
+    expect(findToast()).toBeNull();
+    expect(document.activeElement).toBe(
+      wrapper.find('button[type="submit"]').element,
     );
 
-    const wrapper = mount(FeedbackForm);
-    await wrapper.find('#feedback-name').setValue('Ada Lovelace');
-    await wrapper.find('#feedback-message').setValue('Hello there');
-    await wrapper.find('form').trigger('submit');
-    await wrapper.vm.$nextTick();
-    await new Promise((resolve) => setTimeout(resolve, 0));
+    wrapper.unmount();
+  });
 
-    const fallback = wrapper.find('.feedback__status--error a');
-    expect(fallback.exists()).toBe(true);
-    expect(fallback.attributes('href')).toBe('mailto:rbarakhvostov@gmail.com');
+  it('shows an error toast with a mailto fallback link on server failure', async () => {
+    stubSubmitResponse({ success: false, message: 'bad key' });
+
+    const wrapper = mountForm();
+    await fillAndSubmit(wrapper);
+
+    const toast = findToast();
+    expect(toast?.classList.contains('feedback-toast--error')).toBe(true);
+
+    const fallback = toast?.querySelector('a');
+    expect(fallback?.getAttribute('href')).toBe(
+      'mailto:rbarakhvostov@gmail.com',
+    );
+
+    wrapper.unmount();
   });
 });
