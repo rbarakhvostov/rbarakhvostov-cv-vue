@@ -39,105 +39,113 @@ const bannerMessage = computed(() => {
 
 <template>
   <section class="feedback" data-print-hide>
-    <h2 class="feedback__heading">{{ copy.heading }}</h2>
+    <div class="feedback__heading">
+      <h2>{{ copy.heading }}</h2>
+    </div>
     <div class="feedback__rule" />
-    <p class="feedback__subheading">{{ copy.subheading }}</p>
 
-    <form class="feedback__form" novalidate @submit.prevent="submit">
-      <label class="feedback__honeypot" aria-hidden="true">
-        <input
-          v-model="botcheck"
-          type="checkbox"
-          name="botcheck"
-          tabindex="-1"
-          autocomplete="off"
-        />
-      </label>
+    <div class="feedback__card">
+      <p class="feedback__subheading">{{ copy.subheading }}</p>
 
-      <div class="feedback__field">
-        <label class="feedback__label" for="feedback-name">
-          {{ copy.nameLabel }} <span class="feedback__required">*</span>
+      <form class="feedback__form" novalidate @submit.prevent="submit">
+        <label class="feedback__honeypot" aria-hidden="true">
+          <input
+            v-model="botcheck"
+            type="checkbox"
+            name="botcheck"
+            tabindex="-1"
+            autocomplete="off"
+          />
         </label>
-        <input
-          id="feedback-name"
-          v-model="name"
-          class="feedback__control"
-          type="text"
-          name="name"
-          autocomplete="name"
-          :aria-invalid="fieldErrors.name"
-          :aria-describedby="
-            fieldErrors.name ? 'feedback-name-error' : undefined
-          "
-        />
-        <p
-          v-if="fieldErrors.name"
-          id="feedback-name-error"
-          class="feedback__field-error"
+
+        <div class="feedback__field">
+          <label class="feedback__label" for="feedback-name">
+            {{ copy.nameLabel }} <span class="feedback__required">*</span>
+          </label>
+          <input
+            id="feedback-name"
+            v-model="name"
+            class="feedback__control"
+            type="text"
+            name="name"
+            autocomplete="name"
+            :aria-invalid="fieldErrors.name"
+            :aria-describedby="
+              fieldErrors.name ? 'feedback-name-error' : undefined
+            "
+          />
+          <p
+            v-if="fieldErrors.name"
+            id="feedback-name-error"
+            class="feedback__field-error"
+          >
+            {{ copy.nameRequiredError }}
+          </p>
+        </div>
+
+        <div class="feedback__field">
+          <label class="feedback__label" for="feedback-message">
+            {{ copy.messageLabel }} <span class="feedback__required">*</span>
+          </label>
+          <textarea
+            id="feedback-message"
+            v-model="message"
+            class="feedback__control feedback__control--textarea"
+            name="message"
+            rows="5"
+            :aria-invalid="fieldErrors.message"
+            :aria-describedby="
+              fieldErrors.message ? 'feedback-message-error' : undefined
+            "
+          />
+          <p
+            v-if="fieldErrors.message"
+            id="feedback-message-error"
+            class="feedback__field-error"
+          >
+            {{ copy.messageRequiredError }}
+          </p>
+        </div>
+
+        <button
+          class="feedback__submit"
+          type="submit"
+          :disabled="status === 'sending'"
         >
-          {{ copy.nameRequiredError }}
-        </p>
-      </div>
+          {{ status === 'sending' ? copy.sendingLabel : copy.sendLabel }}
+        </button>
 
-      <div class="feedback__field">
-        <label class="feedback__label" for="feedback-message">
-          {{ copy.messageLabel }} <span class="feedback__required">*</span>
-        </label>
-        <textarea
-          id="feedback-message"
-          v-model="message"
-          class="feedback__control feedback__control--textarea"
-          name="message"
-          rows="5"
-          :aria-invalid="fieldErrors.message"
-          :aria-describedby="
-            fieldErrors.message ? 'feedback-message-error' : undefined
-          "
-        />
         <p
-          v-if="fieldErrors.message"
-          id="feedback-message-error"
-          class="feedback__field-error"
+          v-if="status === 'success'"
+          class="feedback__status feedback__status--success"
         >
-          {{ copy.messageRequiredError }}
+          {{ copy.successMessage }}
         </p>
-      </div>
-
-      <button
-        class="feedback__submit"
-        type="submit"
-        :disabled="status === 'sending'"
-      >
-        {{ status === 'sending' ? copy.sendingLabel : copy.sendLabel }}
-      </button>
-
-      <p
-        v-if="status === 'success'"
-        class="feedback__status feedback__status--success"
-      >
-        {{ copy.successMessage }}
-      </p>
-      <p
-        v-else-if="bannerMessage"
-        class="feedback__status feedback__status--error"
-      >
-        {{ bannerMessage }}
-        <a :href="mailtoHref">{{ copy.fallbackLinkLabel }}</a>
-      </p>
-    </form>
+        <p
+          v-else-if="bannerMessage"
+          class="feedback__status feedback__status--error"
+        >
+          {{ bannerMessage }}
+          <a :href="mailtoHref">{{ copy.fallbackLinkLabel }}</a>
+        </p>
+      </form>
+    </div>
   </section>
 </template>
 
 <style scoped>
 .feedback {
   margin-top: clamp(40px, 6vw, 64px);
-  padding: clamp(24px, 4vw, 36px);
-  border-radius: var(--radius-lg);
-  background: color-mix(in srgb, var(--color-accent) 6%, var(--color-bg));
-  box-shadow: 0 0 0 1px var(--color-divider);
 }
 
 .feedback__heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: clamp(6px, 1vw, 12px);
+}
+
+.feedback__heading h2 {
   margin: 0;
   color: color-mix(in srgb, var(--color-text) 72%, transparent);
   font-size: 14px;
@@ -147,14 +155,27 @@ const bannerMessage = computed(() => {
 
 .feedback__rule {
   height: 1px;
-  margin: clamp(10px, 1.6vw, 14px) 0 clamp(16px, 2.5vw, 22px);
-  background: linear-gradient(to right, var(--color-divider), transparent);
+  margin-bottom: clamp(16px, 2.5vw, 22px);
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--color-divider) 48px,
+    var(--color-divider) calc(100% - 48px),
+    transparent
+  );
+}
+
+.feedback__card {
+  padding: clamp(24px, 4vw, 36px);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--color-accent) 6%, var(--color-bg));
+  box-shadow: 0 0 0 1px var(--color-divider);
 }
 
 .feedback__subheading {
   margin: 0 0 clamp(18px, 2.5vw, 24px);
   color: color-mix(in srgb, var(--color-text) 80%, transparent);
-  font-size: 14.5px;
+  font-size: clamp(15.5px, 1.8vw, 17.5px);
 }
 
 .feedback__form {
@@ -196,6 +217,12 @@ const bannerMessage = computed(() => {
   background: var(--color-bg);
   color: var(--color-text);
   font: inherit;
+}
+
+.feedback__control:focus-visible {
+  border-color: var(--color-accent);
+  outline: 1px solid var(--color-accent);
+  outline-offset: 0;
 }
 
 .feedback__control--textarea {
