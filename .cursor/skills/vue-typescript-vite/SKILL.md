@@ -32,7 +32,7 @@ Currently installed and in use:
 | Shared logic | Composables (`src/features/<name>/composables`) |
 | Global client state | Module-scope `ref`/`computed` inside a composable (e.g. `useResumeLocale`, `useResumeTheme`), persisted via `localStorage` with try/catch |
 | Unit tests | Vitest + Vue Test Utils |
-| Lint / format | ESLint 10 flat config (`typescript-eslint` + `eslint-plugin-vue`) + Prettier |
+| Lint / format | ESLint 10 flat config (`typescript-eslint` + `eslint-plugin-vue`) + Prettier, plus the style rules under "Code style" |
 | CSS | Scoped SFC styles + CSS variables (`assets/styles/tokens.css`, `base.css`) |
 
 Not installed — do not add speculatively; bring in only when a real requirement needs it, and prefer the smallest fix first:
@@ -116,6 +116,29 @@ article { display: grid; gap: 0.5rem; }
 - `v-for` always has a **stable** `:key` (id, not index, unless the list is static).
 - Never use `v-html` with untrusted content.
 - Prefer semantic HTML and native elements. Add ARIA only when native semantics are insufficient.
+
+## Code style
+
+Enforced by ESLint (`func-style`, `prefer-arrow-callback`, `padding-line-between-statements`), not by convention alone:
+
+- Arrow functions only, exports included: `export const useXxx = () => {}`, never `export function useXxx() {}`. This gives up hoisting, so a function is unusable above its own declaration — order within a module matters.
+- A blank line **before and after** `if` and `for` blocks, and **before** every `return`. The first statement in a block is exempt — it needs no blank line above it.
+
+```ts
+const readStoredTheme = (): Theme => {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+
+    if (isTheme(stored)) {
+      return stored;
+    }
+  } catch {
+    // private mode / blocked storage
+  }
+
+  return DEFAULT_THEME;
+};
+```
 
 ## Reactivity and script setup
 

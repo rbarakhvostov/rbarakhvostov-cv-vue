@@ -24,4 +24,22 @@ export default defineConfigWithVueTs(
   },
 
   skipFormatting,
+
+  // Placed after skipFormatting so Prettier's config cannot switch them off.
+  // Prettier preserves blank lines but never inserts them, so the padding rule
+  // is ours to enforce.
+  {
+    name: 'app/code-style',
+    files: ['**/*.{ts,mts,tsx,vue}'],
+    rules: {
+      'func-style': ['error', 'expression', { allowArrowFunctions: true }],
+      'prefer-arrow-callback': 'error',
+      'padding-line-between-statements': [
+        'error',
+        { blankLine: 'always', prev: '*', next: 'return' },
+        { blankLine: 'always', prev: '*', next: ['if', 'for'] },
+        { blankLine: 'always', prev: ['if', 'for'], next: '*' },
+      ],
+    },
+  },
 );

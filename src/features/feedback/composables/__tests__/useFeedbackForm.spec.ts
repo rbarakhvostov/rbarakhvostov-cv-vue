@@ -4,7 +4,7 @@ import { nextTick } from 'vue';
 import { WEB3FORMS_ENDPOINT } from '../../data/web3forms';
 import { useFeedbackForm } from '../useFeedbackForm';
 
-function mockFetchOnce(body: unknown, ok = true): void {
+const mockFetchOnce = (body: unknown, ok = true): void => {
   vi.stubGlobal(
     'fetch',
     vi.fn().mockResolvedValue({
@@ -12,7 +12,7 @@ function mockFetchOnce(body: unknown, ok = true): void {
       json: () => Promise.resolve(body),
     }),
   );
-}
+};
 
 describe('useFeedbackForm', () => {
   afterEach(() => {

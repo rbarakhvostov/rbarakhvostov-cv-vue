@@ -4,12 +4,12 @@ import { initResumeTheme, useResumeTheme } from '../useResumeTheme';
 
 const STORAGE_KEY = 'rb-resume-theme';
 
-function resetThemeState(): void {
+const resetThemeState = (): void => {
   localStorage.clear();
   document.documentElement.removeAttribute('data-theme');
   useResumeTheme().setTheme('dark');
   localStorage.clear();
-}
+};
 
 describe('useResumeTheme', () => {
   beforeEach(() => {

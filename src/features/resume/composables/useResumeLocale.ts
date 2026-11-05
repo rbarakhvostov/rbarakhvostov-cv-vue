@@ -8,13 +8,14 @@ const DEFAULT_LOCALE: Locale = 'en';
 
 const locale = ref<Locale>(DEFAULT_LOCALE);
 
-function isLocale(value: string | null): value is Locale {
+const isLocale = (value: string | null): value is Locale => {
   return value === 'en' || value === 'ru';
-}
+};
 
-function readStoredLocale(): Locale {
+const readStoredLocale = (): Locale => {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
+
     if (isLocale(stored)) {
       return stored;
     }
@@ -23,33 +24,33 @@ function readStoredLocale(): Locale {
   }
 
   return DEFAULT_LOCALE;
-}
+};
 
-function persistLocale(next: Locale): void {
+const persistLocale = (next: Locale): void => {
   try {
     localStorage.setItem(STORAGE_KEY, next);
   } catch {
     // private mode / blocked storage
   }
-}
+};
 
-function applyLocale(next: Locale): void {
+const applyLocale = (next: Locale): void => {
   locale.value = next;
   document.documentElement.lang = next;
   document.title = getResumeCopy(next).name;
-}
+};
 
-export function initResumeLocale(): void {
+export const initResumeLocale = (): void => {
   applyLocale(readStoredLocale());
-}
+};
 
-export function useResumeLocale() {
+export const useResumeLocale = () => {
   const copy = computed(() => getResumeCopy(locale.value));
 
-  function setLocale(next: Locale): void {
+  const setLocale = (next: Locale): void => {
     applyLocale(next);
     persistLocale(next);
-  }
+  };
 
   return {
     locale,
@@ -58,4 +59,4 @@ export function useResumeLocale() {
     isEn: computed(() => locale.value === 'en'),
     isRu: computed(() => locale.value === 'ru'),
   };
-}
+};

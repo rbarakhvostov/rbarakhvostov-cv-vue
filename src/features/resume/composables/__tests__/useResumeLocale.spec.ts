@@ -5,13 +5,13 @@ import { initResumeLocale, useResumeLocale } from '../useResumeLocale';
 
 const STORAGE_KEY = 'rb-resume-lang';
 
-function resetLocaleState(): void {
+const resetLocaleState = (): void => {
   localStorage.clear();
   document.documentElement.removeAttribute('lang');
   document.title = '';
   useResumeLocale().setLocale('en');
   localStorage.clear();
-}
+};
 
 describe('useResumeLocale', () => {
   beforeEach(() => {

@@ -25,7 +25,7 @@
 | Общая логика                    | Composables (`src/features/<name>/composables`)                                                                              |
 | Глобальное клиентское состояние | Модульные `ref`/`computed` внутри composable (`useResumeLocale`, `useResumeTheme`), персист в `localStorage` через try/catch |
 | Юнит-тесты                      | Vitest + Vue Test Utils                                                                                                      |
-| Lint / format                   | ESLint 10 flat config (`typescript-eslint` + `eslint-plugin-vue`) + Prettier                                                 |
+| Lint / format                   | ESLint 10 flat config (`typescript-eslint` + `eslint-plugin-vue`) + Prettier, плюс правила стиля (см. «Стиль кода»)          |
 | CSS                             | Scoped SFC-стили + CSS-переменные (`assets/styles/tokens.css`, `base.css`)                                                   |
 
 Не установлено — не добавлять "про запас"; вносить только под реальную задачу, сначала пробовать самое простое:
@@ -79,6 +79,29 @@ src/
 - У `v-for` всегда стабильный `:key` (id, не индекс, кроме статичных списков).
 - Никогда не использовать `v-html` с недоверенным контентом.
 - Предпочитать семантический HTML и нативные элементы. ARIA — только если нативной семантики недостаточно.
+
+## Стиль кода
+
+Проверяется ESLint (`func-style`, `prefer-arrow-callback`, `padding-line-between-statements`), а не только договорённостью:
+
+- Только **стрелочные функции**, включая экспортируемые: `export const useXxx = () => {}`, не `export function useXxx() {}`. Из-за этого функция недоступна до строки своего объявления — порядок в модуле имеет значение.
+- Пустая строка **до и после** блоков `if` и `for`, и **перед** каждым `return`. Первый оператор в блоке — исключение: перед ним пустая строка не нужна.
+
+```ts
+const readStoredTheme = (): Theme => {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+
+    if (isTheme(stored)) {
+      return stored;
+    }
+  } catch {
+    // private mode / blocked storage
+  }
+
+  return DEFAULT_THEME;
+};
+```
 
 ## Реактивность и script setup
 

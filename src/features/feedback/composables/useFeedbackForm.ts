@@ -9,7 +9,7 @@ import type {
 } from '../types';
 import { hasFeedbackErrors, validateFeedback } from '../utils/validateFeedback';
 
-export function useFeedbackForm() {
+export const useFeedbackForm = () => {
   const name = ref('');
   const message = ref('');
   const botcheck = ref(false);
@@ -34,10 +34,11 @@ export function useFeedbackForm() {
     };
   });
 
-  async function submit(): Promise<void> {
+  const submit = async (): Promise<void> => {
     if (botcheck.value) {
       status.value = 'success';
       errorReason.value = null;
+
       return;
     }
 
@@ -47,13 +48,16 @@ export function useFeedbackForm() {
     if (hasFeedbackErrors(errors)) {
       status.value = 'error';
       errorReason.value = 'validation';
+
       return;
     }
 
     const accessKey = import.meta.env.VITE_WEB3FORMS_ACCESS_KEY;
+
     if (!accessKey) {
       status.value = 'error';
       errorReason.value = 'missing-key';
+
       return;
     }
 
@@ -82,6 +86,7 @@ export function useFeedbackForm() {
       if (!response.ok || !data.success) {
         status.value = 'error';
         errorReason.value = 'server';
+
         return;
       }
 
@@ -94,7 +99,7 @@ export function useFeedbackForm() {
       status.value = 'error';
       errorReason.value = 'network';
     }
-  }
+  };
 
   return {
     name,
@@ -105,4 +110,4 @@ export function useFeedbackForm() {
     fieldErrors,
     submit,
   };
-}
+};

@@ -9,6 +9,6 @@ export const feedbackLocales: Record<Locale, FeedbackCopy> = {
   ru,
 };
 
-export function getFeedbackCopy(locale: Locale): FeedbackCopy {
+export const getFeedbackCopy = (locale: Locale): FeedbackCopy => {
   return feedbackLocales[locale];
-}
+};

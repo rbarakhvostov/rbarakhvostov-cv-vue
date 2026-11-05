@@ -25,7 +25,7 @@ const { name, message, botcheck, status, errorReason, fieldErrors, submit } =
   useFeedbackForm();
 
 // 'validation' stays inline under the offending field, so it maps to null.
-function errorCopyFor(reason: FeedbackErrorReason | null): string | null {
+const errorCopyFor = (reason: FeedbackErrorReason | null): string | null => {
   switch (reason) {
     case 'missing-key':
       return copy.value.configErrorMessage;
@@ -36,22 +36,24 @@ function errorCopyFor(reason: FeedbackErrorReason | null): string | null {
     default:
       return null;
   }
-}
+};
 
 const toast = ref<FeedbackToastPayload | null>(null);
 const submitButton = useTemplateRef<HTMLButtonElement>('submit-button');
 
 // `status` never returns to 'idle', so an identical outcome twice in a row is
 // not a reactive change — await the submission instead of watching the status.
-async function onSubmit(): Promise<void> {
+const onSubmit = async (): Promise<void> => {
   await submit();
 
   if (status.value === 'success') {
     toast.value = { tone: 'success', message: copy.value.successMessage };
+
     return;
   }
 
   const errorMessage = errorCopyFor(errorReason.value);
+
   if (errorMessage) {
     toast.value = {
       tone: 'error',
@@ -59,15 +61,15 @@ async function onSubmit(): Promise<void> {
       link: { href: mailtoHref.value, label: copy.value.fallbackLinkLabel },
     };
   }
-}
+};
 
 // The toast is teleported to the end of <body>, so its close button is the last
 // focusable node; hand focus back to Send instead of resetting to page top.
 // Only on an explicit close — the timer must never steal focus.
-function onToastClose(): void {
+const onToastClose = (): void => {
   toast.value = null;
   submitButton.value?.focus({ preventScroll: true });
-}
+};
 </script>
 
 <template>

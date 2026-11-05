@@ -24,34 +24,34 @@ let timer: ReturnType<typeof setTimeout> | undefined;
 let remaining = 0;
 let startedAt = 0;
 
-function clear(): void {
+const clear = (): void => {
   if (timer !== undefined) {
     clearTimeout(timer);
     timer = undefined;
   }
-}
+};
 
-function start(duration: number): void {
+const start = (duration: number): void => {
   clear();
   remaining = duration;
   startedAt = Date.now();
   timer = setTimeout(() => emit('dismiss'), duration);
-}
+};
 
-function pause(): void {
+const pause = (): void => {
   if (timer === undefined) {
     return;
   }
 
   clear();
   remaining -= Date.now() - startedAt;
-}
+};
 
-function resume(): void {
+const resume = (): void => {
   if (toast && remaining > 0) {
     start(remaining);
   }
-}
+};
 
 // Bumped per toast so that an identical outcome twice in a row replaces the
 // element instead of reusing it — otherwise the enter animation never replays.

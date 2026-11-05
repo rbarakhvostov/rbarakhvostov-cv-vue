@@ -15,21 +15,21 @@ const errorToast: FeedbackToastPayload = {
   link: { href: 'mailto:someone@example.com', label: 'someone@example.com' },
 };
 
-function mountToast(toast: FeedbackToastPayload | null) {
+const mountToast = (toast: FeedbackToastPayload | null) => {
   return mount(FeedbackToast, {
     props: { toast, closeLabel: 'Dismiss notification' },
     attachTo: document.body,
   });
-}
+};
 
 // The toast teleports into <body>, so VTU's wrapper queries cannot reach it.
-function findToast(): HTMLElement | null {
+const findToast = (): HTMLElement | null => {
   return document.body.querySelector('.feedback-toast');
-}
+};
 
-function fire(type: string): void {
+const fire = (type: string): void => {
   findToast()?.dispatchEvent(new Event(type));
-}
+};
 
 beforeEach(() => {
   vi.useFakeTimers();

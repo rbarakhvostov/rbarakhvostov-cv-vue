@@ -11,11 +11,11 @@ const PDF_FILES = {
   },
 } as const satisfies Record<Locale, { path: string; fileName: string }>;
 
-export function getPdfAsset(locale: Locale): PdfAsset {
+export const getPdfAsset = (locale: Locale): PdfAsset => {
   const asset = PDF_FILES[locale];
 
   return {
     href: `${import.meta.env.BASE_URL}${asset.path}`,
     fileName: asset.fileName,
   };
-}
+};

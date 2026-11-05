@@ -7,6 +7,6 @@ export const locales: Record<Locale, ResumeCopy> = {
   ru,
 };
 
-export function getResumeCopy(locale: Locale): ResumeCopy {
+export const getResumeCopy = (locale: Locale): ResumeCopy => {
   return locales[locale];
-}
+};

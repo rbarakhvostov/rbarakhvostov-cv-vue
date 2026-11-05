@@ -4,24 +4,27 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import FeedbackForm from '../FeedbackForm.vue';
 
 // The toast teleports into <body>, so it lives outside the wrapper's tree.
-function findToast(): HTMLElement | null {
+const findToast = (): HTMLElement | null => {
   return document.body.querySelector('.feedback-toast');
-}
+};
 
-function mountForm() {
+const mountForm = () => {
   return mount(FeedbackForm, { attachTo: document.body });
-}
+};
 
-async function fillAndSubmit(
+const fillAndSubmit = async (
   wrapper: ReturnType<typeof mountForm>,
-): Promise<void> {
+): Promise<void> => {
   await wrapper.find('#feedback-name').setValue('Ada Lovelace');
   await wrapper.find('#feedback-message').setValue('Hello there');
   await wrapper.find('form').trigger('submit');
   await flushPromises();
-}
+};
 
-function stubSubmitResponse(body: { success: boolean; message: string }): void {
+const stubSubmitResponse = (body: {
+  success: boolean;
+  message: string;
+}): void => {
   vi.stubEnv('VITE_WEB3FORMS_ACCESS_KEY', 'test-key');
   vi.stubGlobal(
     'fetch',
@@ -30,7 +33,7 @@ function stubSubmitResponse(body: { success: boolean; message: string }): void {
       json: () => Promise.resolve(body),
     }),
   );
-}
+};
 
 afterEach(() => {
   vi.unstubAllGlobals();

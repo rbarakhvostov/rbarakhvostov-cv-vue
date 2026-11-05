@@ -9,12 +9,12 @@ type BuildWeb3FormsPayloadParams = {
   isBot: boolean;
 };
 
-export function buildWeb3FormsPayload({
+export const buildWeb3FormsPayload = ({
   accessKey,
   name,
   message,
   isBot,
-}: BuildWeb3FormsPayloadParams): Web3FormsSubmission {
+}: BuildWeb3FormsPayloadParams): Web3FormsSubmission => {
   return {
     access_key: accessKey,
     subject: `CV feedback from ${name}`,
@@ -23,4 +23,4 @@ export function buildWeb3FormsPayload({
     message,
     botcheck: isBot,
   };
-}
+};
