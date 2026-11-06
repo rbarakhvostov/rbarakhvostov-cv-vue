@@ -4,15 +4,15 @@ import { getResumeCopy } from '../locales';
 import type { Locale } from '../types';
 
 const STORAGE_KEY = 'rb-resume-lang';
-const DEFAULT_LOCALE: Locale = 'en';
+const FALLBACK_LOCALE: Locale = 'en';
 
-const locale = ref<Locale>(DEFAULT_LOCALE);
+const locale = ref<Locale>(FALLBACK_LOCALE);
 
 const isLocale = (value: string | null): value is Locale => {
   return value === 'en' || value === 'ru';
 };
 
-const readStoredLocale = (): Locale => {
+const readStoredLocale = (): Locale | null => {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
 
@@ -23,7 +23,26 @@ const readStoredLocale = (): Locale => {
     // private mode / blocked storage
   }
 
-  return DEFAULT_LOCALE;
+  return null;
+};
+
+const getSystemLocale = (): Locale => {
+  if (typeof navigator === 'undefined') {
+    return FALLBACK_LOCALE;
+  }
+
+  const tags = navigator.languages ?? [navigator.language];
+
+  // Побеждает первый тег, язык которого мы поддерживаем ('ru-RU' → 'ru').
+  for (const tag of tags) {
+    const language = tag?.split('-')[0]?.toLowerCase() ?? null;
+
+    if (isLocale(language)) {
+      return language;
+    }
+  }
+
+  return FALLBACK_LOCALE;
 };
 
 const persistLocale = (next: Locale): void => {
@@ -41,7 +60,7 @@ const applyLocale = (next: Locale): void => {
 };
 
 export const initResumeLocale = (): void => {
-  applyLocale(readStoredLocale());
+  applyLocale(readStoredLocale() ?? getSystemLocale());
 };
 
 export const useResumeLocale = () => {

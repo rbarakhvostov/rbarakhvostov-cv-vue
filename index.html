@@ -5,6 +5,52 @@
     <link rel="icon" href="cv.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Roman Barakhvostov</title>
+    <!--
+      Тема и язык до первой отрисовки: main.ts — deferred-модуль, без этого
+      светлая/русская версия мигнула бы тёмной английской.
+      Правила разрешения должны совпадать с useResumeTheme / useResumeLocale.
+    -->
+    <script>
+      (function () {
+        var root = document.documentElement;
+        var theme = null;
+        var lang = null;
+
+        try {
+          theme = localStorage.getItem('rb-resume-theme');
+          lang = localStorage.getItem('rb-resume-lang');
+        } catch (error) {
+          // private mode / blocked storage
+        }
+
+        if (theme !== 'light' && theme !== 'dark') {
+          theme =
+            window.matchMedia &&
+            window.matchMedia('(prefers-color-scheme: light)').matches
+              ? 'light'
+              : 'dark';
+        }
+
+        if (lang !== 'en' && lang !== 'ru') {
+          var tags = navigator.languages || [navigator.language];
+          lang = 'en';
+
+          for (var i = 0; i < tags.length; i += 1) {
+            var language = String(tags[i] || '')
+              .split('-')[0]
+              .toLowerCase();
+
+            if (language === 'en' || language === 'ru') {
+              lang = language;
+              break;
+            }
+          }
+        }
+
+        root.dataset.theme = theme;
+        root.lang = lang;
+      })();
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
