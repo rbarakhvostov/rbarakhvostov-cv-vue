@@ -11,7 +11,7 @@ Follow these practices for all Vue 3 + TypeScript + Vite work in this repo. Pref
 
 This project is Vue 3.5+, Vite 8, TypeScript (strict, `noUncheckedIndexedAccess`), `@` → `src`, and `vue-tsc --build` for type-checking. Match that stack.
 
-This is a **static, single-page resume app** (see `README.md`): one route, no backend, content lives in local TS modules. Deliberately no router, no Pinia, no HTTP client — don't reintroduce them speculatively. Global state (locale, theme) is module-scope `ref`s inside composables, persisted to `localStorage`. Only add a router / store / query library / VueUse / HTTP wrapper when a real requirement needs it, and prefer the smallest solution first.
+This is a **static, single-page resume app** (see `README.md`): one screen, no backend, resume content lives in local TS modules. Features today: `resume` and `feedback`. Deliberately no router, no Pinia, and no HTTP client library — don't add them speculatively. The only network call is the feedback form: one `fetch` POST of `FormData` to Web3Forms (`features/feedback`). Global state (locale, theme) is module-scope `ref`s inside composables. Both resolve from `localStorage`, otherwise from the system (`navigator.languages`, `prefers-color-scheme`), otherwise `en` and `dark`. Until the visitor picks a theme, it keeps following `prefers-color-scheme`; an explicit choice stops that. Locale is resolved once at startup and does not follow the system afterward. Only add a router / store / query library / VueUse / HTTP wrapper when a real requirement needs it, and prefer the smallest solution first.
 
 ## Non-negotiables
 
@@ -72,8 +72,9 @@ src/
 - Import via `@/` (`@/features/resume/data/jobs`).
 - One component per file. File name = component name (`ResumeHeader.vue`).
 - Composables: `useResumeLocale.ts`. If a store is ever introduced: `useXxxStore.ts`.
-- Keep `data/` and `utils/` free of Vue reactivity. If it needs `ref` / lifecycle, it belongs in `composables/`.
+- Keep `data/` and `utils/` free of Vue reactivity. If it needs `ref` / lifecycle, it belongs in `composables/`. The feedback payload is built in `features/feedback/data/web3forms.ts` (plain `FormData`, no Vue).
 - Tests live next to what they cover, in `__tests__/`.
+- Do not add an `api/` directory until a second remote integration exists. The feedback submit stays a one-shot `fetch` in `useFeedbackForm`.
 
 ## SFC rules
 
@@ -81,20 +82,20 @@ Block order: `<script setup lang="ts">`, then `<template>`, then `<style scoped>
 
 ```vue
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed } from 'vue';
 
 const props = defineProps<{
-  title: string
-  count?: number
-}>()
+  title: string;
+  count?: number;
+}>();
 
 const emit = defineEmits<{
-  select: [id: string]
-  close: []
-}>()
+  select: [id: string];
+  close: [];
+}>();
 
-const { title, count = 0 } = props
-const doubled = computed(() => count * 2)
+const { title, count = 0 } = props;
+const doubled = computed(() => count * 2);
 </script>
 
 <template>
@@ -105,7 +106,10 @@ const doubled = computed(() => count * 2)
 </template>
 
 <style scoped>
-article { display: grid; gap: 0.5rem; }
+article {
+  display: grid;
+  gap: 0.5rem;
+}
 </style>
 ```
 
@@ -153,24 +157,28 @@ const readStoredTheme = (): Theme => {
 ## Composables
 
 ```ts
-export function usePointer(target: MaybeRefOrGetter<HTMLElement | null>) {
-  const x = ref(0)
-  const y = ref(0)
+export const usePointer = (target: MaybeRefOrGetter<HTMLElement | null>) => {
+  const x = ref(0);
+  const y = ref(0);
 
-  function onMove(event: PointerEvent) {
-    x.value = event.clientX
-    y.value = event.clientY
-  }
+  const onMove = (event: PointerEvent): void => {
+    x.value = event.clientX;
+    y.value = event.clientY;
+  };
 
   watchEffect((onCleanup) => {
-    const el = toValue(target)
-    if (!el) return
-    el.addEventListener('pointermove', onMove)
-    onCleanup(() => el.removeEventListener('pointermove', onMove))
-  })
+    const el = toValue(target);
 
-  return { x, y }
-}
+    if (!el) {
+      return;
+    }
+
+    el.addEventListener('pointermove', onMove);
+    onCleanup(() => el.removeEventListener('pointermove', onMove));
+  });
+
+  return { x, y };
+};
 ```
 
 - Name: `useXxx`. Return a **named object**, not a positional tuple (unless a pair like `[state, setState]` is the established API).
@@ -180,16 +188,20 @@ export function usePointer(target: MaybeRefOrGetter<HTMLElement | null>) {
 
 ## State, routing, data fetching
 
-- **Local UI state** lives in the component.
-- **Small global client state** (locale, theme, ...) → module-scope `ref`/`computed` in a composable, exported as a singleton (see `useResumeLocale`, `useResumeTheme`). Every call site shares the same instance. Wrap `localStorage` reads/writes in try/catch and fall back to a sane default (private-browsing mode can throw).
+- **Local UI state** lives in the component. Feedback fields, field errors, and toast status live in `useFeedbackForm` because the submit flow is what its tests cover — still one composable, not a store.
+- **Small global client state** (locale, theme) → module-scope `ref`/`computed` in a composable, exported as a singleton (see `useResumeLocale`, `useResumeTheme`). Every call site shares the same instance. Wrap `localStorage` reads/writes in try/catch and fall back to a sane default (private-browsing mode can throw). An empty `catch` is only for that known failure, and it needs a comment saying why.
+- Resolution order for both: stored choice, otherwise the system (`navigator.languages` for locale, `prefers-color-scheme` for theme), otherwise `en` / `dark`. `setTheme` persists the choice and unsubscribes from the system theme. `setLocale` persists the choice; locale does not keep following the system after startup. Storage keys are `rb-resume-lang` and `rb-resume-theme`.
+- The system-theme listener is created from `initResumeTheme()` in `main.ts`, outside any component scope, so `onScopeDispose` does not apply. Remove it explicitly in `setTheme` and on a repeated init.
+- Before first paint, an inline script in `index.html` sets `html[data-theme]` and `html[lang]` with the same rules and the same storage keys. `main.ts` is deferred; without that script a light or Russian first visit would flash dark English. Keep the script and the composables in lockstep.
 - There is no router: the app is a single screen (`App.vue` → `ResumePage`). Don't add Vue Router for what is still one page.
 - If cross-feature state genuinely outgrows a composable (many independent consumers, complex derived state), promote it to a Pinia setup store instead of growing an ad-hoc module singleton.
-- There is no server data: content is static TS modules under `features/<name>/data/`. If the app ever fetches remote data, use a query library for the cache — don't hand-roll fetch+cache in a composable or store.
-- App bootstrap in `main.ts`: run side-effect inits that must land before first paint (e.g. `initResumeTheme()`, `initResumeLocale()`) → `createApp(App).mount('#app')`. Add `app.use(...)` calls only when a plugin (router, Pinia, etc.) actually exists.
+- Resume content is static TS under `features/resume/data/`. The feedback form is a one-shot `fetch` (`status` / `errorReason` refs), not cached server state. If the app ever loads remote data onto the screen, use a query library for that cache — don't hand-roll fetch+cache in a composable or store.
+- App bootstrap in `main.ts`: run side-effect inits that must land before first paint (`initResumeTheme()`, `initResumeLocale()`) → `createApp(App).mount('#app')`. Add `app.use(...)` calls only when a plugin (router, Pinia, etc.) actually exists.
+- Visit counts are a GoatCounter script tag at the end of `index.html` (`count.v5.js` with an `integrity` hash). It is not an npm dependency, not a composable, and not an env var. Don't fold it into the Vue app.
 
 ## Vite and TypeScript
 
-- Env: only `VITE_*` is exposed to the client. No custom env vars exist yet (only built-ins like `import.meta.env.BASE_URL`, used in `data/pdf.ts`). If you add one, type it in `env.d.ts` via `ImportMetaEnv`. Access through `import.meta.env`, never `process.env`.
+- Env: only `VITE_*` is exposed to the client. The one custom var is optional `VITE_WEB3FORMS_ACCESS_KEY`, typed in `env.d.ts` and templated in `.env.example`. It is a publishable access key (Web3Forms restricts it with a domain allow-list) and it is inlined into the bundle — still do not commit `.env`, and do not put real secrets in `VITE_*`. A missing key is a handled form error, not a crash. Built-in `import.meta.env.BASE_URL` is used in `features/resume/data/pdf.ts`. Access through `import.meta.env`, never `process.env`. Type any new var on `ImportMetaEnv`.
 - Keep the `@` alias in both `vite.config.ts` and `tsconfig.app.json`.
 - Use `import type { Foo } from '...'` for type-only imports.
 - Prefer official Vite plugins. Do not add webpack-era loaders or `vite-plugin-vue2`.

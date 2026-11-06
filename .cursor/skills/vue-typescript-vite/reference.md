@@ -8,17 +8,17 @@ Prefer setup syntax. Keep stores thin: state + actions that mutate client state.
 
 ```ts
 export const useUiStore = defineStore('ui', () => {
-  const sidebarOpen = ref(false)
-  const theme = ref<'light' | 'dark'>('light')
+  const sidebarOpen = ref(false);
+  const theme = ref<'light' | 'dark'>('light');
 
-  function toggleSidebar() {
-    sidebarOpen.value = !sidebarOpen.value
-  }
+  const toggleSidebar = (): void => {
+    sidebarOpen.value = !sidebarOpen.value;
+  };
 
-  const isDark = computed(() => theme.value === 'dark')
+  const isDark = computed(() => theme.value === 'dark');
 
-  return { sidebarOpen, theme, isDark, toggleSidebar }
-})
+  return { sidebarOpen, theme, isDark, toggleSidebar };
+});
 ```
 
 - Store id is a stable string. Do not rename casually (devtools + persistence).
@@ -47,17 +47,19 @@ export const useUiStore = defineStore('ui', () => {
 
 ## Data fetching
 
-Component-local one-shots (user click, form submit): `async` function + `ref` for pending/error.
+The feedback form is the existing one-shot: `async` `submit` in `useFeedbackForm`, with `ref`s for status and error. It posts `FormData` and does not cache a response. Do not wrap it in a query library.
 
-Lists, details, shared caches: TanStack Vue Query (or Pinia Colada).
+Component-local one-shots (user click, form submit): an `async` arrow function plus `ref`s for pending/error.
+
+Lists, details, shared caches — only if the screen starts loading remote data: TanStack Vue Query (or Pinia Colada).
 
 ```ts
-export function useUser(id: MaybeRefOrGetter<string>) {
+export const useUser = (id: MaybeRefOrGetter<string>) => {
   return useQuery({
     queryKey: computed(() => ['users', toValue(id)] as const),
     queryFn: ({ signal }) => fetchUser(toValue(id), { signal }),
-  })
-}
+  });
+};
 ```
 
 - Pass `AbortSignal` into `fetch` / `ofetch`.
@@ -69,17 +71,17 @@ export function useUser(id: MaybeRefOrGetter<string>) {
 Use only for deep, stable dependencies (theme, form context, current tree item). Type with `InjectionKey`.
 
 ```ts
-export const formKey: InjectionKey<FormContext> = Symbol('form')
+export const formKey: InjectionKey<FormContext> = Symbol('form');
 ```
 
 Do not use provide/inject as a global store. That is Pinia.
 
 ## Forms
 
-- Native `<form @submit.prevent>` as the baseline.
-- For complex forms: VeeValidate + Zod (or Valibot). Schema is the source of truth for types and messages.
+- Native `<form @submit.prevent>` as the baseline. The feedback form stays that way: `validateFeedback` in `utils/`, field errors and toast status in `useFeedbackForm`. Do not add VeeValidate for it.
+- For a form that outgrows that: VeeValidate + Zod (or Valibot). Schema is the source of truth for types and messages.
 - `defineModel` for field wrappers. Do not invent `value` + `input` emit pairs.
-- Disable submit while pending. Surface field-level and form-level errors.
+- Disable submit while pending. Surface field-level and form-level errors. The feedback form clears a field error as soon as that field is valid again, and does not raise new errors until the next submit.
 
 ## Styling
 
@@ -101,22 +103,24 @@ Do not use provide/inject as a global store. That is Pinia.
 
 ### `env.d.ts`
 
+Current `env.d.ts`. Add new vars here. Keep a var optional when the page must still render without it.
+
 ```ts
 /// <reference types="vite/client" />
 
 interface ImportMetaEnv {
-  readonly VITE_API_URL: string
+  readonly VITE_WEB3FORMS_ACCESS_KEY?: string;
 }
 
 interface ImportMeta {
-  readonly env: ImportMetaEnv
+  readonly env: ImportMetaEnv;
 }
 ```
 
 ## Testing
 
 - Unit: Vitest, same Vite resolve aliases.
-- Component: Testing Library (`@testing-library/vue`) — assert what the user sees/does, not internal refs.
+- Component: Vue Test Utils (`mount`). Assert rendered text, attributes, and emitted events. Do not add Testing Library unless the project adopts it.
 - Composables: call inside `setup()` via `createApp` helper or a tiny test host component. Test fake timers and cleanup.
 - Mock network at the API module boundary, not `window.fetch` in every test unless that is the unit under test.
 - E2E: Playwright against `vite preview` or a dedicated preview server. Do not use Cypress unless already in the repo.
@@ -144,7 +148,7 @@ interface ImportMeta {
 - App-level: `app.config.errorHandler`.
 - Tree-level: `onErrorCaptured` in a layout/error boundary component.
 - Async UI: feature-level error state, not only a global toast.
-- Never swallow errors with empty `catch {}`.
+- Do not swallow unexpected errors with an empty `catch`. An empty `catch` is only for a known environmental failure (private-mode `localStorage`), and it needs a comment saying why.
 
 ## ESLint / TS hygiene
 
