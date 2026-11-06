@@ -23,8 +23,8 @@ export const en: ResumeCopy = {
       'Used AI-assisted tooling to speed up development and improve code quality (50% increase in productivity)',
     ],
     senla: [
-      'Built operator-facing banking app and contributed to CRM development, reducing employee workload by more than 50%',
-      'Collaborated with backend developers, UX/UI designers, BA and QA to implement and integrate complex financial features, ensuring seamless functionality and a cohesive user interface for banking applications. This increased user satisfaction by 70%',
+      'Built an operator-facing banking app and contributed to CRM development, reducing employee workload by more than 50%',
+      'Collaborated with backend developers, UX/UI designers, BA, and QA to implement and integrate complex financial features, ensuring seamless functionality and a cohesive user interface for banking applications. This increased user satisfaction by 70%',
       'Designed and discussed application architecture',
       'Wrote unit and integration tests',
       'Conducted code reviews to keep quality and coding standards consistent',
