@@ -4,17 +4,19 @@
 
 Приложение: [https://roman-barakhvostov-cv.netlify.app/](https://roman-barakhvostov-cv.netlify.app/)
 
-Одностраничное приложение-резюме: шапка с именем, ролью и контактами, краткое summary, опыт работы, навыки и скачивание PDF — на английском и русском.
+Одностраничное приложение-резюме: шапка с именем, ролью и контактами, краткое summary, опыт работы, навыки, скачивание PDF и форма обратной связи — на английском и русском.
 
-Стек: **Vue 3.5** (Composition API, `<script setup>`), **TypeScript** (strict), **Vite 8**. Состояние локали и темы живёт в composable-ах, данные резюме — в статичных модулях, UI собран по фиче `resume`.
+Стек: **Vue 3.5** (Composition API, `<script setup>`), **TypeScript** (strict), **Vite 8**. Состояние локали и темы живёт в composable-ах, данные резюме — в статичных модулях, UI собран по фичам `resume` и `feedback`.
 
 ## Что умеет страница
 
 - переключение языка **EN / RU** (тексты, `document.title`, `html[lang]`);
-- светлая и тёмная тема (`html[data-theme]`), по умолчанию тёмная;
-- оба выбора сохраняются в `localStorage` и поднимаются при следующем заходе;
+- светлая и тёмная тема (`html[data-theme]`);
+- при первом заходе язык и тема берутся из системы: `navigator.languages` и `prefers-color-scheme`. Если система ничего подходящего не даёт — `en` и `dark`. Пока тему не выбрали вручную, она продолжает следовать смене `prefers-color-scheme`; явный выбор отключает это слежение;
+- оба выбора после переключения сохраняются в `localStorage` и поднимаются при следующем заходе;
 - скачивание PDF-версии резюме под текущий язык;
-- контакты, опыт работы и список навыков.
+- контакты, опыт работы и список навыков;
+- форма обратной связи: имя и сообщение уходят на почту через [Web3Forms](https://web3forms.com/), успех и ошибки доставки показываются тостом.
 
 ## Аналитика
 
@@ -40,12 +42,13 @@
 | Сборка   | Vite, алиас `@` → `src`                         |
 | Тесты    | Vitest + Vue Test Utils                         |
 | Качество | ESLint, Stylelint, Prettier, Husky, lint-staged |
+| Почта    | Web3Forms, `fetch` + `FormData`                 |
 
-Роутера, Pinia и HTTP-клиента нет: контент статический, страница одна.
+Роутера и Pinia нет. Сетевой запрос один: форма шлёт `FormData` через `fetch`.
 
 ## Как устроено приложение
 
-Код растёт **по фичам**, а не по типу файлов. Общие презентационные компоненты лежат в `src/components/`, всё про резюме — в `src/features/resume/`.
+Код растёт **по фичам**, а не по типу файлов. Общие презентационные компоненты лежат в `src/components/`, резюме — в `src/features/resume/`, форма — в `src/features/feedback/`.
 
 ```
 src/
@@ -54,13 +57,21 @@ src/
 ├── assets/styles/               # токены и глобальный CSS
 ├── components/                  # общие UI-примитивы
 │   └── SegmentedToggle.vue
-└── features/resume/
-    ├── types.ts                 # Locale, Theme, ResumeCopy, JobMeta
-    ├── composables/             # клиентское состояние
-    ├── data/                    # контакты, вакансии, навыки, PDF
-    ├── locales/                 # тексты EN / RU
-    ├── ui/                      # секции страницы
-    └── utils/                   # чистые функции без Vue API
+└── features/
+    ├── resume/
+    │   ├── types.ts             # Locale, Theme, ResumeCopy, JobMeta
+    │   ├── composables/         # локаль и тема
+    │   ├── data/                # контакты, вакансии, навыки, PDF
+    │   ├── locales/             # тексты EN / RU
+    │   ├── ui/                  # секции страницы
+    │   └── utils/               # чистые функции без Vue API
+    └── feedback/
+        ├── types.ts             # статус, ошибки, тост, ответ API
+        ├── composables/         # useFeedbackForm
+        ├── data/                # сборка FormData для Web3Forms
+        ├── locales/             # тексты формы EN / RU
+        ├── ui/                  # FeedbackForm, FeedbackToast
+        └── utils/               # validateFeedback
 ```
 
 ### Схема слоёв
@@ -92,6 +103,14 @@ flowchart TB
     Types["types.ts"]
   end
 
+  subgraph feedbackFeature [Фича feedback]
+    Form["FeedbackForm"]
+    Toast["FeedbackToast"]
+    FeedbackState["useFeedbackForm"]
+    FeedbackCopy["feedback/locales"]
+    Web3Forms["api.web3forms.com"]
+  end
+
   subgraph shared [Общее]
     Toggle["SegmentedToggle"]
     Storage["localStorage"]
@@ -108,14 +127,21 @@ flowchart TB
   Page --> Summary
   Page --> Experience
   Page --> Skills
+  Page --> Form
 
   Toolbar --> Locale
   Toolbar --> Theme
   Toolbar --> Toggle
+  Toolbar --> Pdf
   Header --> Contacts
-  Header --> Pdf
   Experience --> Jobs
   Skills --> SkillsData
+
+  Form --> FeedbackState
+  Form --> FeedbackCopy
+  Form --> Toast
+  FeedbackState --> Web3Forms
+  Form --> Locale
 
   Locale --> Copy
   Locale --> Storage
@@ -129,11 +155,12 @@ flowchart TB
 
 ### Как данные доходят до экрана
 
-1. `main.ts` вызывает `initResumeTheme()` и `initResumeLocale()` **до** `createApp`. Тема и язык читаются из `localStorage` и сразу пишутся в DOM. Без сохранённого значения тема — `dark` (`index.html` сразу ставит `data-theme="dark"`), язык — `en`; это убирает вспышку светлой темы и рассинхрон заголовка.
-2. `App.vue` монтирует `ResumePage` — единственный экран.
-3. `ResumePage` берёт `locale` и `copy` из `useResumeLocale` и раздаёт их секциям пропсами.
-4. Метаданные (компании, периоды, ссылки, ключи ролей) лежат в `data/`. Переводимые строки — в `locales/`. Секция опыта склеивает их: `copy.jobs[job.id]` и `copy[job.roleKey]`.
-5. Тема не прокидывается пропсами: `useResumeTheme` ставит `data-theme` на `<html>`, а цвета берутся из CSS-переменных в `tokens.css`.
+1. До первой отрисовки инлайн-скрипт в [`index.html`](index.html) ставит `data-theme` и `lang`. `main.ts` — отложенный модуль, без этого скрипта страница мигнула бы тёмной английской. Правила те же, что в composable-ах: сохранённый выбор, иначе системные `prefers-color-scheme` и `navigator.languages`, иначе `dark` и `en`.
+2. `main.ts` вызывает `initResumeTheme()` и `initResumeLocale()` **до** `createApp` и повторяет то же разрешение. Здесь же выставляется `document.title` (в разметке заголовок английский). Если сохранённой темы нет, `initResumeTheme` подписывается на смену `prefers-color-scheme`.
+3. `App.vue` монтирует `ResumePage` — единственный экран.
+4. `ResumePage` берёт `copy` из `useResumeLocale` и раздаёт его секциям пропсами. Форма сама читает локаль и берёт тексты из `features/feedback/locales`.
+5. Метаданные (компании, периоды, ссылки, ключи ролей) лежат в `data/`. Переводимые строки — в `locales/`. Секция опыта склеивает их: `copy.jobs[job.id]` и `copy[job.roleKey]`.
+6. Тема не прокидывается пропсами: `useResumeTheme` ставит `data-theme` на `<html>`, а цвета берутся из CSS-переменных в `tokens.css`.
 
 ```mermaid
 flowchart LR
@@ -149,9 +176,10 @@ flowchart LR
 
   setTheme --> LS2["localStorage: rb-resume-theme"]
   setTheme --> HtmlTheme["html data-theme"]
+  setTheme --> Unwatch["снять слежение за системой"]
   HtmlTheme --> Tokens["CSS-переменные"]
 
-  Copy --> Header["шапка, summary, опыт"]
+  Copy --> Header["шапка, summary, опыт, форма"]
   Tokens --> Page["вся страница"]
 ```
 
@@ -159,12 +187,14 @@ flowchart LR
 
 `locale` и `theme` — модульные `ref` внутри composable-ов. Все вызовы `useResumeLocale()` / `useResumeTheme()` видят один и тот же экземпляр. Этого достаточно: состояние глобальное, но крошечное, и его не нужно кэшировать как серверные данные.
 
-| Composable        | Ключ storage      | Побочный эффект                |
-| ----------------- | ----------------- | ------------------------------ |
-| `useResumeLocale` | `rb-resume-lang`  | `html[lang]`, `document.title` |
-| `useResumeTheme`  | `rb-resume-theme` | `html[data-theme]`             |
+| Composable        | Ключ storage      | Побочный эффект                                        |
+| ----------------- | ----------------- | ------------------------------------------------------ |
+| `useResumeLocale` | `rb-resume-lang`  | `html[lang]`, `document.title`                         |
+| `useResumeTheme`  | `rb-resume-theme` | `html[data-theme]`, слежение за `prefers-color-scheme` |
 
-Оба переживают недоступный `localStorage` (приватный режим): чтение и запись обёрнуты в `try/catch`, приложение остаётся на значениях по умолчанию (`en`, `dark`).
+Чтение и запись `localStorage` обёрнуты в `try/catch`. Если хранилище недоступно (приватный режим), сохранённого выбора нет, и снова работают системные настройки. `en` и `dark` остаются только когда нет ни хранилища, ни `navigator` / `matchMedia`.
+
+Явный `setTheme` записывает выбор и снимает подписку на системную тему. `setLocale` тоже записывает выбор; язык читается один раз при старте и дальше сам за системой не ходит.
 
 ### Почему данные разделены
 
@@ -175,8 +205,23 @@ flowchart LR
 | `data/contacts.ts`               | mailto, Telegram, LinkedIn, GitHub                   | не зависит от локали               |
 | `data/skills.ts`                 | чипы навыков                                         | названия технологий не переводятся |
 | `data/pdf.ts`                    | путь и имя файла PDF                                 | разные файлы для EN и RU           |
+| `feedback/locales/`              | подписи, ошибки и тексты тостов формы                | меняется с языком резюме           |
 
 Типы в `types.ts` связывают эти слои: `JobId` и `RoleKey` не дают сослаться на несуществующую вакансию или роль.
+
+## Обратная связь
+
+Секция внизу `ResumePage`. Тексты формы живут отдельно от резюме и переключаются той же локалью.
+
+Отправка — `POST` на `https://api.web3forms.com/submit`. Тело собирает `buildWeb3FormsFormData` как `FormData`: `multipart/form-data` входит в safelist CORS, и браузер отправляет запрос сразу, без preflight `OPTIONS`. В части WebView (встроенный браузер Telegram на iOS) такой preflight обрывается и выглядит как ошибка сети.
+
+Ключ доступа — `VITE_WEB3FORMS_ACCESS_KEY`. Шаблон лежит в [`.env.example`](.env.example): скопируйте его в `.env` и подставьте ключ из дашборда Web3Forms. Файл `.env` в git не попадает. Ключ попадает в клиентский бандл; Web3Forms ограничивает его списком доменов. Локально без ключа отправка не уходит, тост предлагает написать на почту напрямую.
+
+Поведение формы:
+
+- пустые имя или сообщение подсвечиваются под полем; ошибка снимается, как только поле снова валидно, и до следующей отправки новые ошибки не ставятся;
+- успех, сетевая ошибка, ответ сервера и отсутствующий ключ показываются тостом (`FeedbackToast`). У ошибок доставки в тосте есть ссылка `mailto`;
+- скрытый чекбокс-honeypot: если он отмечен, форма делает вид, что сообщение ушло, и запрос не отправляет.
 
 ## Запуск
 
@@ -184,8 +229,11 @@ flowchart LR
 
 ```sh
 npm install
+cp .env.example .env
 npm run dev
 ```
+
+В `.env` замените `VITE_WEB3FORMS_ACCESS_KEY` на ключ Web3Forms и добавьте домен в allow-list ключа. Без ключа страница открывается, форма при отправке показывает ошибку конфигурации.
 
 Сборка и предпросмотр:
 
@@ -220,13 +268,16 @@ npm run test
 
 Type-check и тесты специально не в lint-staged: это проверки всего проекта, а не отдельных путей.
 
+ESLint дополнительно требует стрелочные функции и пустую строку до и после `if` / `for`, а также перед каждым `return`.
+
 ## Как править контент
 
 - тексты резюме — `src/features/resume/locales/en.ts` и `ru.ts`;
 - места работы — `src/features/resume/data/jobs.ts` (и буллеты в локалях под тем же `JobId`);
 - контакты — `src/features/resume/data/contacts.ts`;
 - навыки — `src/features/resume/data/skills.ts`;
-- PDF — файлы в `public/uploads/`, пути в `src/features/resume/data/pdf.ts`.
+- PDF — файлы в `public/uploads/`, пути в `src/features/resume/data/pdf.ts`;
+- тексты формы обратной связи — `src/features/feedback/locales/en.ts` и `ru.ts`.
 
 Новую вакансию добавляйте сразу в три места: `JobId` в `types.ts`, объект в `jobs.ts`, массив буллетов в обеих локалях.
 
