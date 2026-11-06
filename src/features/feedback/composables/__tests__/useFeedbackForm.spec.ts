@@ -58,7 +58,7 @@ describe('useFeedbackForm', () => {
 
     expect(fetch).toHaveBeenCalledWith(
       WEB3FORMS_ENDPOINT,
-      expect.objectContaining({ method: 'POST' }),
+      expect.objectContaining({ method: 'POST', body: expect.any(FormData) }),
     );
     expect(form.status.value).toBe('success');
     expect(form.name.value).toBe('');

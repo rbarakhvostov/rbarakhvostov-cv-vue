@@ -1,6 +1,6 @@
 import { ref, watch } from 'vue';
 
-import { buildWeb3FormsPayload, WEB3FORMS_ENDPOINT } from '../data/web3forms';
+import { buildWeb3FormsFormData, WEB3FORMS_ENDPOINT } from '../data/web3forms';
 import type {
   FeedbackErrorReason,
   FeedbackFieldErrors,
@@ -67,18 +67,12 @@ export const useFeedbackForm = () => {
     try {
       const response = await fetch(WEB3FORMS_ENDPOINT, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        },
-        body: JSON.stringify(
-          buildWeb3FormsPayload({
-            accessKey,
-            name: name.value,
-            message: message.value,
-            isBot: botcheck.value,
-          }),
-        ),
+        headers: { Accept: 'application/json' },
+        body: buildWeb3FormsFormData({
+          accessKey,
+          name: name.value,
+          message: message.value,
+        }),
       });
 
       const data = (await response.json()) as Web3FormsResponse;

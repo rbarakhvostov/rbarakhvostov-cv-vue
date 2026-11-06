@@ -21,15 +21,6 @@ export type FeedbackToast = {
   link?: FeedbackToastLink;
 };
 
-export type Web3FormsSubmission = {
-  access_key: string;
-  subject: string;
-  from_name: string;
-  name: string;
-  message: string;
-  botcheck: boolean;
-};
-
 export type Web3FormsResponse = {
   success: boolean;
   message: string;
