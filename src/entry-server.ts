@@ -1,5 +1,5 @@
 import { createSSRApp } from 'vue';
-import { renderToString, type SSRContext } from 'vue/server-renderer';
+import { renderToString } from 'vue/server-renderer';
 
 import App from './App.vue';
 import { setResumeLocale } from './features/resume/composables/useResumeLocale';
@@ -19,8 +19,6 @@ export type PrerenderedPage = {
   head: string;
   /** Разметка внутрь `#app`. */
   html: string;
-  /** Якоря `<Teleport to="body">` — без них гидратация слоя тостов ломается. */
-  teleports: string;
 };
 
 /**
@@ -42,15 +40,13 @@ export const renderAll = async (): Promise<readonly PrerenderedPage[]> => {
   for (const locale of LOCALES) {
     setResumeLocale(locale);
 
-    const context: SSRContext = {};
-    const html = await renderToString(createSSRApp(App), context);
+    const html = await renderToString(createSSRApp(App));
 
     pages.push({
       route: LOCALE_PATHS[locale],
       lang: locale,
       head: buildHead(locale),
       html,
-      teleports: context.teleports?.body ?? '',
     });
   }
 

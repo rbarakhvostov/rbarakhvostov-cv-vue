@@ -78,13 +78,6 @@
     </script>
   </head>
   <body>
-    <!--
-      Якоря <Teleport to="body"> обязаны быть ПЕРВЫМ узлом body: при гидратации
-      Vue стартует с body.firstChild и ждёт там комментарий «teleport start
-      anchor». Любой текстовый узел перед ним — и слой тостов начнёт
-      гидратироваться поверх #app. Плагин сборки съедает пробелы до маркера.
-    -->
-    <!--app-teleports-->
     <div id="app"><!--app-html--></div>
     <script type="module" src="/src/main.ts"></script>
     <script

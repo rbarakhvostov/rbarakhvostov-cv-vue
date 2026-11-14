@@ -83,6 +83,25 @@ describe('SegmentedToggle', () => {
     expect(wrapper.emitted('select')?.[0]).toEqual(['ru']);
   });
 
+  // Выделение выбранного сегмента держится на классе is-on: CSS в jsdom не
+  // считается, поэтому проверяем, что класс стоит ровно на одном сегменте и
+  // переезжает вместе с выбором.
+  it('marks exactly one segment as selected', async () => {
+    const wrapper = mount(SegmentedToggle, {
+      props: { modelValue: 'en', options, label: 'Language' },
+    });
+
+    expect(wrapper.findAll('.is-on')).toHaveLength(1);
+    expect(wrapper.findAll('button')[0]?.classes()).toContain('is-on');
+
+    await wrapper.setProps({ modelValue: 'ru' });
+
+    expect(wrapper.findAll('.is-on')).toHaveLength(1);
+    expect(wrapper.findAll('button')[1]?.classes()).toContain('is-on');
+
+    wrapper.unmount();
+  });
+
   it('names the group so that role="group" is not announced blank', () => {
     const wrapper = mount(SegmentedToggle, {
       props: { modelValue: 'en', options, label: 'Language' },

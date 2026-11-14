@@ -11,7 +11,9 @@
      подобраны по фону карточки формы — color-mix(accent 6%, bg). */
   --color-control-border: color-mix(in srgb, #e9e9ed 42%, transparent);
 
-  /* Toast tones: intentionally identical in both themes. */
+  /* Тона тоста. Светлая тема переопределяет их ниже: эти значения рассчитаны
+     на тёмную поверхность (5.06:1 и 8.53:1), а на светлой давали 2.44:1 и
+     1.45:1 — цветовой сигнал там просто не читался. */
   --color-danger: #ff5c6b;
   --color-success: #3ddc87;
 
@@ -86,6 +88,10 @@
   --color-role: var(--color-accent-800);
   --color-divider: color-mix(in srgb, #292b31 18%, transparent);
   --color-control-border: color-mix(in srgb, #292b31 56%, transparent);
+
+  /* 4.80:1 и 4.35:1 к --color-surface против прежних 2.44 и 1.45. */
+  --color-danger: #c0243a;
+  --color-success: #147a4b;
   --shadow-lg: 0 0 0 1px #cfd3e5, 0 16px 40px rgb(41 43 49 / 16%);
   --chip-bg: var(--color-accent-200);
   --chip-fg: var(--color-accent-800);

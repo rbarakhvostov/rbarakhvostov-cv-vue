@@ -91,60 +91,62 @@ onScopeDispose(clear);
 </script>
 
 <template>
-  <Teleport to="body">
-    <div
-      class="feedback-toast-layer"
-      data-print-hide
-      role="status"
-      aria-live="polite"
-      aria-atomic="true"
-    >
-      <!-- out-in: a replacement must not sit beside the outgoing toast. -->
-      <Transition name="feedback-toast" mode="out-in">
-        <!-- Правило ждёт роль и клавиатурный обработчик, но эти четыре
+  <!-- Без Teleport намеренно: слой фиксированный, но в DOM стоит сразу за
+       формой, поэтому с кнопки Send до ссылки в тосте — один Tab. Телепорт в
+       <body> ставил его ПЕРЕД #app (гидратация требует якоря первым узлом),
+       и до вечного тоста ошибки приходилось идти ~19 Shift+Tab назад. -->
+  <div
+    class="feedback-toast-layer"
+    data-print-hide
+    role="status"
+    aria-live="polite"
+    aria-atomic="true"
+  >
+    <!-- out-in: a replacement must not sit beside the outgoing toast. -->
+    <Transition name="feedback-toast" mode="out-in">
+      <!-- Правило ждёт роль и клавиатурный обработчик, но эти четыре
              листенера ничего не активируют: они лишь ставят на паузу
              автозакрытие, пока указатель или фокус внутри. Это сама по себе
              мера доступности, а не интерактивность, требующая роли. -->
-        <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
-        <div
-          v-if="toast"
-          :key="renderKey"
-          class="feedback-toast"
-          :class="`feedback-toast--${toast.tone}`"
-          @mouseenter="pause"
-          @mouseleave="resume"
-          @focusin="pause"
-          @focusout="resume"
+      <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
+      <div
+        v-if="toast"
+        :key="renderKey"
+        class="feedback-toast"
+        :class="`feedback-toast--${toast.tone}`"
+        @mouseenter="pause"
+        @mouseleave="resume"
+        @focusin="pause"
+        @focusout="resume"
+      >
+        <p class="feedback-toast__text">
+          {{ toast.message }}
+          <a v-if="toast.link" :href="toast.link.href">{{
+            toast.link.label
+          }}</a>
+        </p>
+        <button
+          class="feedback-toast__close"
+          type="button"
+          :aria-label="closeLabel"
+          @click="emit('close')"
         >
-          <p class="feedback-toast__text">
-            {{ toast.message }}
-            <a v-if="toast.link" :href="toast.link.href">{{
-              toast.link.label
-            }}</a>
-          </p>
-          <button
-            class="feedback-toast__close"
-            type="button"
-            :aria-label="closeLabel"
-            @click="emit('close')"
+          <svg
+            width="14"
+            height="14"
+            viewBox="0 0 16 16"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+            aria-hidden="true"
           >
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 16 16"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.5"
-              stroke-linecap="round"
-              aria-hidden="true"
-            >
-              <path d="M4 4l8 8M12 4l-8 8" />
-            </svg>
-          </button>
-        </div>
-      </Transition>
-    </div>
-  </Teleport>
+            <path d="M4 4l8 8M12 4l-8 8" />
+          </svg>
+        </button>
+      </div>
+    </Transition>
+  </div>
 </template>
 
 <style scoped>
@@ -228,6 +230,28 @@ onScopeDispose(clear);
 .feedback-toast-leave-to {
   transform: translateY(12px);
   opacity: 0;
+}
+
+/* На узком экране тост шире кнопки Send и накрыл бы её целиком, пока на ней
+   стоит фокус (WCAG 2.4.11). В потоке он встаёт сразу под формой — ровно там,
+   где и лежит в DOM, — и перекрывать ему уже нечего. На десктопе проблемы нет:
+   тост шириной 440px отцентрован, а Send прижата к левому краю карточки. */
+@media screen and (width <= 640px) {
+  .feedback-toast-layer {
+    position: static;
+    padding: 16px 0 0;
+  }
+}
+
+/* Контур тоста держится на box-shadow, а его режим форсирует в none —
+   остался бы текст без рамки поверх Canvas. Цвет полосы тона тоже
+   форсируется, так что успех и ошибка в этом режиме неразличимы по цвету;
+   смысл несёт текст сообщения. */
+@media (forced-colors: active) {
+  .feedback-toast {
+    border: 1px solid CanvasText;
+    border-left-width: 3px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

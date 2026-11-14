@@ -81,4 +81,16 @@ defineProps<{
     font-size: 11px;
   }
 }
+
+/* Градиент линейки режим не форсирует, фон чипа — форсирует: без этого
+   остались бы серая полоса из тёмной темы и чипы без границ. */
+@media (forced-colors: active) {
+  .skills__rule {
+    background: CanvasText;
+  }
+
+  .skills__chip {
+    border: 1px solid CanvasText;
+  }
+}
 </style>

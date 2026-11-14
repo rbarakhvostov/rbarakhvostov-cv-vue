@@ -86,9 +86,9 @@ const onSubmit = async (): Promise<void> => {
   }
 };
 
-// The toast is teleported to the end of <body>, so its close button is the last
-// focusable node; hand focus back to Send instead of resetting to page top.
-// Only on an explicit close — the timer must never steal focus.
+// Закрытие убирает из DOM элемент, на котором стоял фокус, — вернуть его надо
+// вручную, иначе он утечёт на <body>. Только при явном закрытии: таймер фокус
+// трогать не должен.
 const onToastClose = (): void => {
   toast.value = null;
   submitButton.value?.focus({ preventScroll: true });
@@ -313,5 +313,18 @@ const onToastClose = (): void => {
 
 .feedback__submit:hover:not(:disabled) {
   background: color-mix(in srgb, var(--color-accent) 16%, transparent);
+}
+
+/* Карточку очерчивает box-shadow, а линейку — градиент: первый режим
+   форсирует в none, второй не трогает вовсе, и форма теряет визуальную
+   группировку. */
+@media (forced-colors: active) {
+  .feedback__card {
+    border: 1px solid CanvasText;
+  }
+
+  .feedback__rule {
+    background: CanvasText;
+  }
 }
 </style>

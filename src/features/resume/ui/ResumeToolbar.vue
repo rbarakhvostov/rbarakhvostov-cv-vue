@@ -126,4 +126,11 @@ const themeOptions = computed(
 .toolbar svg {
   flex: none;
 }
+
+/* Разделитель нарисован background, который форсируется в Canvas. */
+@media (forced-colors: active) {
+  .toolbar__divider {
+    background: CanvasText;
+  }
+}
 </style>

@@ -89,10 +89,12 @@ defineProps<{
   letter-spacing: 0.04em;
 }
 
+/* gap 6px, а не 4: при 4px центры соседних ссылок расходятся на 23.4px, а
+   WCAG 2.5.8 требует 24. Совпадает с gap у .header__contacts. */
 .job__urls {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -159,6 +161,20 @@ defineProps<{
 @media screen and (width <= 640px) {
   .job {
     gap: 16px 36px;
+  }
+}
+
+/* Градиенты режим не форсирует, поэтому верхняя граница осталась бы серой
+   полосой из тёмной темы поверх Canvas; тире маркеров нарисованы background,
+   а он форсируется в Canvas и исчезает вместе с ними. */
+@media (forced-colors: active) {
+  .job {
+    background: none;
+    border-top: 1px solid CanvasText;
+  }
+
+  .job__bullets li::before {
+    background: CanvasText;
   }
 }
 </style>

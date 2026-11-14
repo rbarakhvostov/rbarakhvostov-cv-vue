@@ -43,8 +43,10 @@ const { copy } = useResumeLocale();
   padding: clamp(26px, 5vw, 60px) clamp(20px, 5vw, 64px) 96px;
 }
 
-/* Скрыт, пока не получит фокус с клавиатуры. z-index выше слоя тоста (50),
-   чтобы всплывший тост не перекрыл ссылку. */
+/* Скрыт, пока не получит фокус. z-index выше слоя тоста (50), чтобы всплывший
+   тост не перекрыл ссылку. Раскрываем по :focus, а не :focus-visible: мышью
+   ссылку 1×1px осмысленно не нажать, так что отличать модальность незачем, а
+   при программном .focus() после клика Chromium/WebKit :focus-visible не дают. */
 .skip-link {
   position: absolute;
   width: 1px;
@@ -54,7 +56,7 @@ const { copy } = useResumeLocale();
   white-space: nowrap;
 }
 
-.skip-link:focus-visible {
+.skip-link:focus {
   position: fixed;
   top: 12px;
   left: 12px;
@@ -74,5 +76,13 @@ const { copy } = useResumeLocale();
 
 main:focus-visible {
   outline: none;
+}
+
+/* Раскрытый скип-линк держится на фоне и тени: фон форсируется в Canvas,
+   тень — в none, и ссылка легла бы на страницу без границ. */
+@media (forced-colors: active) {
+  .skip-link:focus {
+    border: 1px solid CanvasText;
+  }
 }
 </style>

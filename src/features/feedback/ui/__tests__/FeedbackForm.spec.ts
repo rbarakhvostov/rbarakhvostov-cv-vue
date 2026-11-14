@@ -126,8 +126,32 @@ describe('FeedbackForm', () => {
     expect(toast).not.toBeNull();
     expect(toast?.classList.contains('feedback-toast--success')).toBe(true);
     expect(toast?.textContent).toContain('Thanks! Your message has been sent.');
-    // The toast must escape the form's data-print-hide subtree.
-    expect(wrapper.text()).not.toContain('Thanks! Your message has been sent.');
+    // Тост живёт внутри формы, поэтому из печати его убирает собственный
+    // data-print-hide, а не телепорт за пределы секции.
+    expect(
+      wrapper.find('.feedback-toast-layer').attributes('data-print-hide'),
+    ).toBeDefined();
+
+    wrapper.unmount();
+  });
+
+  // Регрессия, которую не ловил ни один тест: пока тост телепортировался в
+  // <body>, в собранной странице он оказывался ПЕРЕД #app, и от Send до его
+  // mailto-ссылки было ~19 Shift+Tab назад через всю страницу.
+  it('places the toast after the submit button in DOM order', async () => {
+    stubSubmitResponse({ success: false, message: 'bad key' });
+
+    const wrapper = mountForm();
+    await fillAndSubmit(wrapper);
+
+    const submit = wrapper.find('button[type="submit"]').element;
+    const toast = findToast();
+
+    expect(toast).not.toBeNull();
+    expect(
+      submit.compareDocumentPosition(toast as Node) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
 
     wrapper.unmount();
   });

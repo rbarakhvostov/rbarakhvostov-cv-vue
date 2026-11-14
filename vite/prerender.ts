@@ -10,7 +10,6 @@ type PrerenderedPage = {
   lang: string;
   head: string;
   html: string;
-  teleports: string;
 };
 
 type ServerEntry = {
@@ -22,13 +21,11 @@ const SSR_ENTRY = 'src/entry-server.ts';
 const SSR_OUT_DIR = 'dist-ssr';
 const SSR_BUNDLE = join(SSR_OUT_DIR, 'entry-server.js');
 
-const BODY_OPEN = '<body>';
 const TITLE_OPEN = '<title>';
 const TITLE_CLOSE = '</title>';
 
 const HEAD_MARKER = '<!--app-head-->';
 const HTML_MARKER = '<!--app-html-->';
-const TELEPORTS_MARKER = '<!--app-teleports-->';
 const LANG_MARKER = '<html lang="en"';
 
 const isPrerenderedPage = (value: unknown): value is PrerenderedPage => {
@@ -42,8 +39,7 @@ const isPrerenderedPage = (value: unknown): value is PrerenderedPage => {
     typeof page.route === 'string' &&
     typeof page.lang === 'string' &&
     typeof page.head === 'string' &&
-    typeof page.html === 'string' &&
-    typeof page.teleports === 'string'
+    typeof page.html === 'string'
   );
 };
 
@@ -95,31 +91,6 @@ const stripDevTitle = (template: string): string => {
   return template.slice(0, start) + template.slice(next);
 };
 
-/**
- * Якоря телепорта должны стать первым узлом `<body>`: `hydrateTeleport`
- * начинает с `target.firstChild` и ждёт там комментарий «teleport start
- * anchor». Поэтому вставляем не «вместо маркера», а «вместо всего, что стоит
- * между `<body>` и концом маркера» — так в выдачу не попадёт ни текстовый
- * узел с отступом Prettier, ни поясняющий комментарий.
- */
-const injectTeleports = (template: string, teleports: string): string => {
-  const bodyEnd = template.indexOf(BODY_OPEN) + BODY_OPEN.length;
-  const markerStart = template.indexOf(TELEPORTS_MARKER);
-  const between = template.slice(bodyEnd, markerStart);
-
-  if (!/^\s*(?:<!--[\s\S]*?-->\s*)*$/.test(between)) {
-    throw new Error(
-      'Only whitespace and comments may sit between <body> and the teleports marker.',
-    );
-  }
-
-  return (
-    template.slice(0, bodyEnd) +
-    teleports +
-    template.slice(markerStart + TELEPORTS_MARKER.length)
-  );
-};
-
 const renderPage = (template: string, page: PrerenderedPage): string => {
   const withHead = replaceOnce(
     replaceOnce(
@@ -131,10 +102,7 @@ const renderPage = (template: string, page: PrerenderedPage): string => {
     page.head,
   );
 
-  return injectTeleports(
-    replaceOnce(withHead, HTML_MARKER, page.html),
-    page.teleports,
-  );
+  return replaceOnce(withHead, HTML_MARKER, page.html);
 };
 
 const loadServerEntry = async (root: string): Promise<ServerEntry> => {
@@ -188,7 +156,6 @@ export const prerender = (): Plugin => {
       for (const needle of [
         HEAD_MARKER,
         HTML_MARKER,
-        TELEPORTS_MARKER,
         LANG_MARKER,
         TITLE_OPEN,
       ]) {
