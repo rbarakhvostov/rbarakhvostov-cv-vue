@@ -4,3 +4,7 @@ coverage
 node_modules
 package-lock.json
 .cursor
+
+# Файл подтверждения Google Search Console: содержимое должно байт в байт
+# совпадать с тем, что выдал Google.
+public/google*.html
