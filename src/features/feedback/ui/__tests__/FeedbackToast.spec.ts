@@ -92,14 +92,43 @@ describe('FeedbackToast', () => {
     wrapper.unmount();
   });
 
-  it('keeps an error toast up longer than a success toast', async () => {
+  // В тосте ошибки лежит запасная mailto-ссылка, поэтому таймера у него нет
+  // вовсе: уводить её из-под пользователя нельзя (WCAG 2.2.1).
+  it('never auto-dismisses an error toast', async () => {
     const wrapper = mountToast(null);
     await wrapper.setProps({ toast: errorToast });
 
-    vi.advanceTimersByTime(5000);
+    vi.advanceTimersByTime(300000);
     expect(wrapper.emitted('dismiss')).toBeUndefined();
 
-    vi.advanceTimersByTime(3000);
+    wrapper.unmount();
+  });
+
+  // pause() на hover запоминает остаток, resume() его доигрывает. У тоста без
+  // таймера остаток должен быть нулевым, иначе hover «оживил» бы автозакрытие.
+  it('does not start a timer for an error toast after a hover', async () => {
+    const wrapper = mountToast(null);
+    await wrapper.setProps({ toast: errorToast });
+
+    fire('mouseenter');
+    fire('mouseleave');
+
+    vi.advanceTimersByTime(300000);
+    expect(wrapper.emitted('dismiss')).toBeUndefined();
+
+    wrapper.unmount();
+  });
+
+  // Успех по-прежнему уходит сам: там нечего дочитывать.
+  it('still auto-dismisses a success toast that follows an error toast', async () => {
+    const wrapper = mountToast(null);
+    await wrapper.setProps({ toast: errorToast });
+
+    vi.advanceTimersByTime(10000);
+
+    await wrapper.setProps({ toast: successToast });
+
+    vi.advanceTimersByTime(5000);
     expect(wrapper.emitted('dismiss')).toHaveLength(1);
 
     wrapper.unmount();

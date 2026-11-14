@@ -38,7 +38,10 @@ const themeOptions = computed(
 </script>
 
 <template>
-  <div class="toolbar" data-print-hide>
+  <!-- <header>, а не <div>: тулбар лежит вне <main>, и только так он попадает
+       в лендмарк banner — иначе навигация по лендмаркам пропускает его целиком.
+       <header> внутри ResumeHeader вложен в <main> и остаётся generic. -->
+  <header class="toolbar" data-print-hide>
     <div class="toolbar__group">
       <PdfDownloadLink :locale="locale" />
     </div>
@@ -46,12 +49,14 @@ const themeOptions = computed(
       <SegmentedToggle
         :model-value="locale"
         :options="langOptions"
+        :label="copy.langGroupLabel"
         @select="rememberLocale"
       />
       <span class="toolbar__divider" />
       <SegmentedToggle
         :model-value="theme"
         :options="themeOptions"
+        :label="copy.themeGroupLabel"
         @update:model-value="setTheme"
       >
         <template #default="{ option }">
@@ -89,7 +94,7 @@ const themeOptions = computed(
         </template>
       </SegmentedToggle>
     </div>
-  </div>
+  </header>
 </template>
 
 <style scoped>

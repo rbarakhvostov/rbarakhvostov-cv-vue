@@ -32,7 +32,7 @@ Currently installed and in use:
 | Shared logic | Composables (`src/features/<name>/composables`) |
 | Global client state | Module-scope `ref`/`computed` inside a composable (e.g. `useResumeLocale`, `useResumeTheme`), persisted via `localStorage` with try/catch |
 | Unit tests | Vitest + Vue Test Utils |
-| Lint / format | ESLint 10 flat config (`typescript-eslint` + `eslint-plugin-vue`) + Prettier, plus the style rules under "Code style" |
+| Lint / format | ESLint 10 flat config (`typescript-eslint` + `eslint-plugin-vue` + `eslint-plugin-vuejs-accessibility`) + Prettier, plus the style rules under "Code style" |
 | CSS | Scoped SFC styles + CSS variables (`assets/styles/tokens.css`, `base.css`) |
 
 Not installed — do not add speculatively; bring in only when a real requirement needs it, and prefer the smallest fix first:
@@ -125,6 +125,8 @@ article {
 - `v-for` always has a **stable** `:key` (id, not index, unless the list is static).
 - Never use `v-html` with untrusted content.
 - Prefer semantic HTML and native elements. Add ARIA only when native semantics are insufficient.
+- Give every `<ul>` with `list-style: none` an explicit `role="list"`: Safari/VoiceOver drops list semantics otherwise. That is why `vuejs-accessibility/no-redundant-roles` is turned off.
+- Check any new text or control-border colour for contrast (WCAG AA — 4.5:1 for text, 3:1 for borders and the focus ring) in both themes before committing. Start muted text at `color-mix(... 72%, transparent)`; below that the light theme fails AA.
 
 ## Code style
 

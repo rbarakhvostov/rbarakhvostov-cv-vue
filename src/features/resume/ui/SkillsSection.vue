@@ -12,7 +12,8 @@ defineProps<{
       <h2 id="skills-heading">{{ heading }}</h2>
     </div>
     <div class="skills__rule" />
-    <ul class="skills__list">
+    <!-- role="list": list-style: none снимает семантику списка в Safari/VO. -->
+    <ul class="skills__list" role="list">
       <li v-for="skill in skills" :key="skill" class="skills__chip">
         {{ skill }}
       </li>

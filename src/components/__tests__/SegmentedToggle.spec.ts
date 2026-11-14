@@ -14,6 +14,7 @@ describe('SegmentedToggle', () => {
       props: {
         modelValue: 'en',
         options,
+        label: 'Language',
         'onUpdate:modelValue': (value: string) => {
           void wrapper.setProps({ modelValue: value });
         },
@@ -42,6 +43,7 @@ describe('SegmentedToggle', () => {
     const wrapper = mount(SegmentedToggle, {
       props: {
         modelValue: 'en',
+        label: 'Language',
         options: [
           { value: 'en', label: 'EN', href: '/' },
           { value: 'ru', label: 'RU', href: '/ru/' },
@@ -57,7 +59,7 @@ describe('SegmentedToggle', () => {
     expect(links).toHaveLength(2);
     expect(first?.attributes('href')).toBe('/');
     expect(first?.attributes('hreflang')).toBe('en');
-    expect(first?.attributes('aria-current')).toBe('true');
+    expect(first?.attributes('aria-current')).toBe('page');
     expect(first?.classes()).toContain('is-on');
 
     // На ссылке aria-pressed неуместен — роль выбранного несёт aria-current.
@@ -81,9 +83,21 @@ describe('SegmentedToggle', () => {
     expect(wrapper.emitted('select')?.[0]).toEqual(['ru']);
   });
 
+  it('names the group so that role="group" is not announced blank', () => {
+    const wrapper = mount(SegmentedToggle, {
+      props: { modelValue: 'en', options, label: 'Language' },
+    });
+
+    const group = wrapper.get('[role="group"]');
+
+    expect(group.attributes('aria-label')).toBe('Language');
+
+    wrapper.unmount();
+  });
+
   it('reports a select for button options too', async () => {
     const wrapper = mount(SegmentedToggle, {
-      props: { modelValue: 'en', options },
+      props: { modelValue: 'en', options, label: 'Language' },
     });
 
     await wrapper.findAll('button')[1]?.trigger('click');

@@ -6,6 +6,7 @@ import {
 } from '@vue/eslint-config-typescript';
 import { globalIgnores } from 'eslint/config';
 import pluginVue from 'eslint-plugin-vue';
+import pluginVueA11y from 'eslint-plugin-vuejs-accessibility';
 
 export default defineConfigWithVueTs(
   {
@@ -17,6 +18,28 @@ export default defineConfigWithVueTs(
 
   pluginVue.configs['flat/essential'],
   vueTsConfigs.recommended,
+  pluginVueA11y.configs['flat/recommended'],
+
+  {
+    name: 'app/a11y-overrides',
+    files: ['**/*.vue'],
+    rules: {
+      // Плагин считает role="list" на <ul> избыточным по спецификации, и
+      // формально он прав. Но Safari/VoiceOver снимает семантику списка, когда
+      // у него list-style: none, а это все списки в проекте, — role возвращает
+      // её обратно. Отключаем правило целиком, а не точечными disable-строками:
+      // это позиция по проекту, а не исключение в одном месте.
+      'vuejs-accessibility/no-redundant-roles': 'off',
+
+      // По умолчанию правило требует одновременно и обёртку, и for/id. Для
+      // связи достаточно одного: у полей формы это for/id, у ханипота —
+      // вложенность (ему id ни к чему, он aria-hidden и вне таб-порядка).
+      'vuejs-accessibility/label-has-for': [
+        'error',
+        { required: { some: ['nesting', 'id'] } },
+      ],
+    },
+  },
 
   {
     ...pluginVitest.configs.recommended,

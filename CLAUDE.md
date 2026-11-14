@@ -19,14 +19,14 @@
 
 Сейчас установлено и используется:
 
-| Что                             | Выбор                                                                                                                        |
-| ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| UI-компоненты                   | SFC, Composition API, типизированные props/emits                                                                             |
-| Общая логика                    | Composables (`src/features/<name>/composables`)                                                                              |
-| Глобальное клиентское состояние | Модульные `ref`/`computed` внутри composable (`useResumeLocale`, `useResumeTheme`), персист в `localStorage` через try/catch |
-| Юнит-тесты                      | Vitest + Vue Test Utils                                                                                                      |
-| Lint / format                   | ESLint 10 flat config (`typescript-eslint` + `eslint-plugin-vue`) + Prettier, плюс правила стиля (см. «Стиль кода»)          |
-| CSS                             | Scoped SFC-стили + CSS-переменные (`assets/styles/tokens.css`, `base.css`)                                                   |
+| Что                             | Выбор                                                                                                                                                     |
+| ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| UI-компоненты                   | SFC, Composition API, типизированные props/emits                                                                                                          |
+| Общая логика                    | Composables (`src/features/<name>/composables`)                                                                                                           |
+| Глобальное клиентское состояние | Модульные `ref`/`computed` внутри composable (`useResumeLocale`, `useResumeTheme`), персист в `localStorage` через try/catch                              |
+| Юнит-тесты                      | Vitest + Vue Test Utils                                                                                                                                   |
+| Lint / format                   | ESLint 10 flat config (`typescript-eslint` + `eslint-plugin-vue` + `eslint-plugin-vuejs-accessibility`) + Prettier, плюс правила стиля (см. «Стиль кода») |
+| CSS                             | Scoped SFC-стили + CSS-переменные (`assets/styles/tokens.css`, `base.css`)                                                                                |
 
 Не установлено — не добавлять "про запас"; вносить только под реальную задачу, сначала пробовать самое простое:
 
@@ -85,6 +85,8 @@ scripts/
 - У `v-for` всегда стабильный `:key` (id, не индекс, кроме статичных списков).
 - Никогда не использовать `v-html` с недоверенным контентом.
 - Предпочитать семантический HTML и нативные элементы. ARIA — только если нативной семантики недостаточно.
+- У `<ul>` с `list-style: none` ставить `role="list"`: Safari/VoiceOver иначе снимает семантику списка. Правило `vuejs-accessibility/no-redundant-roles` отключено именно поэтому.
+- Новый цвет текста или границы контрола проверять на контраст (WCAG AA — 4.5:1 для текста, 3:1 для границ и фокус-кольца) до коммита, в обеих темах. Приглушённый текст набирать от `color-mix(... 72%, transparent)` — ниже светлая тема проваливает AA.
 
 ## Стиль кода
 

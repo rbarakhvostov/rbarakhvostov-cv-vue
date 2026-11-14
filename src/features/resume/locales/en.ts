@@ -12,8 +12,13 @@ export const en: ResumeCopy = {
     'Software Engineer | React Frontend Developer | Next.js Developer',
   roleReact: 'Software Engineer | React Frontend Developer',
   roleVue: 'Software Engineer | Vue Frontend Developer',
-  lightLabel: 'Light',
-  darkLabel: 'Dark',
+  skipToContent: 'Skip to content',
+  langGroupLabel: 'Language',
+  themeGroupLabel: 'Theme',
+  // Кнопки темы иконочные, поэтому эти строки целиком составляют их доступное
+  // имя — без существительного «Light» ни о чём не говорит.
+  lightLabel: 'Light theme',
+  darkLabel: 'Dark theme',
   pdfLabel: 'Download CV as PDF',
   jobs: {
     alfa: [

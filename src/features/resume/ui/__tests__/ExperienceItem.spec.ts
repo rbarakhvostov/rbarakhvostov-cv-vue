@@ -30,4 +30,31 @@ describe('ExperienceItem', () => {
       ruWrapper.findAll('.job__number').map((node) => node.text()),
     ).toEqual(['50%', '80%', '50%']);
   });
+
+  it('names the article by its company heading', () => {
+    const wrapper = mount(ExperienceItem, {
+      props: { job, roleLine: en.roleReactNext, bullets: en.jobs.alfa },
+    });
+
+    const labelledBy = wrapper.get('article').attributes('aria-labelledby');
+
+    expect(labelledBy).toBe('job-alfa-heading');
+    expect(wrapper.get(`#${labelledBy}`).text()).toBe('Alfa-Bank');
+
+    wrapper.unmount();
+  });
+
+  // list-style: none снимает семантику списка в Safari/VoiceOver — её
+  // возвращает явный role="list".
+  it('keeps list semantics for bullets and job urls', () => {
+    const wrapper = mount(ExperienceItem, {
+      props: { job, roleLine: en.roleReactNext, bullets: en.jobs.alfa },
+    });
+
+    expect(wrapper.get('.job__bullets').attributes('role')).toBe('list');
+    expect(wrapper.get('.job__urls').attributes('role')).toBe('list');
+    expect(wrapper.findAll('.job__urls li a')).toHaveLength(job.urls.length);
+
+    wrapper.unmount();
+  });
 });

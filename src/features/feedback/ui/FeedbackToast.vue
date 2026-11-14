@@ -3,9 +3,12 @@ import { onScopeDispose, ref, watch } from 'vue';
 
 import type { FeedbackToast, FeedbackToastTone } from '../types';
 
-const DURATIONS: Record<FeedbackToastTone, number> = {
+// null — не закрывать по таймеру. В тосте ошибки лежит запасная mailto-ссылка,
+// и прежние 8 секунд не гарантировали, что до неё успеют добраться: пауза
+// срабатывает только на hover/focus (WCAG 2.2.1).
+const DURATIONS: Record<FeedbackToastTone, number | null> = {
   success: 5000,
-  error: 8000,
+  error: null,
 };
 
 const { toast } = defineProps<{
@@ -62,12 +65,25 @@ const renderKey = ref(0);
 watch(
   () => toast,
   (next) => {
-    if (next) {
-      renderKey.value += 1;
-      start(DURATIONS[next.tone]);
-    } else {
+    if (!next) {
       clear();
+
+      return;
     }
+
+    renderKey.value += 1;
+
+    const duration = DURATIONS[next.tone];
+
+    // remaining = 0 заодно обезвреживает resume() после hover по такому тосту.
+    if (duration === null) {
+      clear();
+      remaining = 0;
+
+      return;
+    }
+
+    start(duration);
   },
 );
 
@@ -85,6 +101,11 @@ onScopeDispose(clear);
     >
       <!-- out-in: a replacement must not sit beside the outgoing toast. -->
       <Transition name="feedback-toast" mode="out-in">
+        <!-- Правило ждёт роль и клавиатурный обработчик, но эти четыре
+             листенера ничего не активируют: они лишь ставят на паузу
+             автозакрытие, пока указатель или фокус внутри. Это сама по себе
+             мера доступности, а не интерактивность, требующая роли. -->
+        <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
         <div
           v-if="toast"
           :key="renderKey"
@@ -187,7 +208,7 @@ onScopeDispose(clear);
   border: 0;
   border-radius: var(--radius-sm);
   background: transparent;
-  color: color-mix(in srgb, var(--color-text) 60%, transparent);
+  color: color-mix(in srgb, var(--color-text) 72%, transparent);
   cursor: pointer;
 }
 

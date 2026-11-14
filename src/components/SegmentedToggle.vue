@@ -21,6 +21,8 @@ const model = defineModel<T>({ required: true });
 
 const { options } = defineProps<{
   options: readonly Option[];
+  /** Имя группы для скринридера. Обязателен: role="group" без имени бесполезен. */
+  label: string;
 }>();
 
 // Ссылка и кнопка расходятся не только тегом: aria-pressed на ссылке
@@ -32,7 +34,8 @@ const attrsFor = (option: Option): Record<string, unknown> => {
     return {
       href: option.href,
       hreflang: option.value,
-      'aria-current': isOn ? 'true' : undefined,
+      // 'page', а не 'true': ссылка ведёт на текущую страницу.
+      'aria-current': isOn ? 'page' : undefined,
     };
   }
 
@@ -53,7 +56,7 @@ const onSelect = (option: Option): void => {
 </script>
 
 <template>
-  <div class="segmented" role="group">
+  <div class="segmented" role="group" :aria-label="label">
     <component
       :is="option.href ? 'a' : 'button'"
       v-for="option in options"
@@ -86,7 +89,7 @@ const onSelect = (option: Option): void => {
   padding: 0;
   border: 0;
   background: transparent;
-  color: color-mix(in srgb, var(--color-text) 60%, transparent);
+  color: color-mix(in srgb, var(--color-text) 72%, transparent);
   font: inherit;
   font-size: 12.5px;
   letter-spacing: 0.04em;

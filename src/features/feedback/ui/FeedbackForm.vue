@@ -24,7 +24,8 @@ const mailtoHref = computed(
 const { name, message, botcheck, status, errorReason, fieldErrors, submit } =
   useFeedbackForm();
 
-// 'validation' stays inline under the offending field, so it maps to null.
+// 'validation' stays inline under the offending field and is announced by
+// moving focus there, so it maps to null instead of raising a toast.
 const errorCopyFor = (reason: FeedbackErrorReason | null): string | null => {
   switch (reason) {
     case 'missing-key':
@@ -40,6 +41,22 @@ const errorCopyFor = (reason: FeedbackErrorReason | null): string | null => {
 
 const toast = ref<FeedbackToastPayload | null>(null);
 const submitButton = useTemplateRef<HTMLButtonElement>('submit-button');
+const nameInput = useTemplateRef<HTMLInputElement>('name-input');
+const messageInput = useTemplateRef<HTMLTextAreaElement>('message-input');
+
+// Валидация намеренно не поднимает тост, а инлайн-ошибки не живут в
+// live-region — без переноса фокуса сабмит пустой формы для скринридера
+// выглядел бы как полное отсутствие реакции. На сфокусированном поле он
+// зачитает подпись, aria-invalid и текст ошибки через aria-describedby.
+const focusFirstInvalid = (): void => {
+  if (fieldErrors.value.name) {
+    nameInput.value?.focus();
+
+    return;
+  }
+
+  messageInput.value?.focus();
+};
 
 // `status` never returns to 'idle', so an identical outcome twice in a row is
 // not a reactive change — await the submission instead of watching the status.
@@ -48,6 +65,12 @@ const onSubmit = async (): Promise<void> => {
 
   if (status.value === 'success') {
     toast.value = { tone: 'success', message: copy.value.successMessage };
+
+    return;
+  }
+
+  if (errorReason.value === 'validation') {
+    focusFirstInvalid();
 
     return;
   }
@@ -95,14 +118,18 @@ const onToastClose = (): void => {
 
         <div class="feedback__field">
           <label class="feedback__label" for="feedback-name">
-            {{ copy.nameLabel }} <span class="feedback__required">*</span>
+            {{ copy.nameLabel }}
+            <!-- Обязательность несёт required; «*» читался бы как «звёздочка». -->
+            <span class="feedback__required" aria-hidden="true">*</span>
           </label>
           <input
             id="feedback-name"
+            ref="name-input"
             v-model="name"
             class="feedback__control"
             type="text"
             name="name"
+            required
             autocomplete="name"
             :aria-invalid="fieldErrors.name"
             :aria-describedby="
@@ -120,14 +147,17 @@ const onToastClose = (): void => {
 
         <div class="feedback__field">
           <label class="feedback__label" for="feedback-message">
-            {{ copy.messageLabel }} <span class="feedback__required">*</span>
+            {{ copy.messageLabel }}
+            <span class="feedback__required" aria-hidden="true">*</span>
           </label>
           <textarea
             id="feedback-message"
+            ref="message-input"
             v-model="message"
             class="feedback__control feedback__control--textarea"
             name="message"
             rows="5"
+            required
             :aria-invalid="fieldErrors.message"
             :aria-describedby="
               fieldErrors.message ? 'feedback-message-error' : undefined
@@ -241,7 +271,7 @@ const onToastClose = (): void => {
 .feedback__control {
   box-sizing: border-box;
   padding: 9px 12px;
-  border: 1px solid var(--color-divider);
+  border: 1px solid var(--color-control-border);
   border-radius: var(--radius-md);
   background: var(--color-bg);
   color: var(--color-text);

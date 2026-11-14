@@ -15,6 +15,9 @@ export type ResumeCopy = {
   roleReactNext: string;
   roleReact: string;
   roleVue: string;
+  skipToContent: string;
+  langGroupLabel: string;
+  themeGroupLabel: string;
   lightLabel: string;
   darkLabel: string;
   pdfLabel: string;

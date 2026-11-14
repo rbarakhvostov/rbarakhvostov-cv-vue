@@ -6,6 +6,11 @@
   --color-accent-2: #a7a1db;
   --color-divider: color-mix(in srgb, #e9e9ed 16%, transparent);
 
+  /* Граница полей ввода, а не декоративный разделитель: WCAG 1.4.11 требует
+     от неё 3:1 к соседнему фону, чего --color-divider не даёт. Проценты
+     подобраны по фону карточки формы — color-mix(accent 6%, bg). */
+  --color-control-border: color-mix(in srgb, #e9e9ed 42%, transparent);
+
   /* Toast tones: intentionally identical in both themes. */
   --color-danger: #ff5c6b;
   --color-success: #3ddc87;
@@ -72,10 +77,16 @@
   --color-bg: #f3f5fe;
   --color-surface: #e4e7f5;
   --color-text: #292b31;
-  --color-accent: #796cbf;
+
+  /* Акцент и роль сдвинуты на ступень вниз по рампе: прежний accent-600
+     (#796cbf) давал на светлом фоне 4.10:1 — ниже AA, а это цвет ссылок,
+     подсветки цифр, ошибок формы и кнопки Send. Теперь 6.23:1, а ховер
+     (--color-role) остаётся заметно темнее ссылки — 9.44:1. */
+  --color-accent: var(--color-accent-700);
+  --color-role: var(--color-accent-800);
   --color-divider: color-mix(in srgb, #292b31 18%, transparent);
+  --color-control-border: color-mix(in srgb, #292b31 56%, transparent);
   --shadow-lg: 0 0 0 1px #cfd3e5, 0 16px 40px rgb(41 43 49 / 16%);
   --chip-bg: var(--color-accent-200);
   --chip-fg: var(--color-accent-800);
-  --color-role: var(--color-accent-700);
 }

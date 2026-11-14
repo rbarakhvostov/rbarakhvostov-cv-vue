@@ -12,23 +12,28 @@ defineProps<{
 </script>
 
 <template>
-  <article class="job" :class="{ 'is-first': isFirst }">
+  <!-- Без aria-labelledby все четыре article безымянны, и скринридер
+       объявляет их как «статья» без указания компании. -->
+  <article
+    class="job"
+    :class="{ 'is-first': isFirst }"
+    :aria-labelledby="`job-${job.id}-heading`"
+  >
     <div class="job__meta">
-      <h3 class="job__company">{{ job.company }}</h3>
+      <h3 :id="`job-${job.id}-heading`" class="job__company">
+        {{ job.company }}
+      </h3>
       <div class="job__period">{{ job.period }}</div>
-      <div class="job__urls">
-        <a
-          v-for="url in job.urls"
-          :key="url.href"
-          :href="url.href"
-          rel="noopener"
-          >{{ url.label }}</a
-        >
-      </div>
+      <ul class="job__urls" role="list">
+        <li v-for="url in job.urls" :key="url.href">
+          <a :href="url.href" rel="noopener">{{ url.label }}</a>
+        </li>
+      </ul>
     </div>
     <div class="job__body">
       <RoleLine class="job__role" :value="roleLine" />
-      <ul class="job__bullets">
+      <!-- role="list": list-style: none снимает семантику списка в Safari/VO. -->
+      <ul class="job__bullets" role="list">
         <li v-for="bullet in bullets" :key="bullet">
           <template
             v-for="(part, partIndex) in splitHighlightedNumbers(bullet)"
@@ -79,7 +84,7 @@ defineProps<{
 
 .job__period {
   margin-bottom: 6px;
-  color: color-mix(in srgb, var(--color-text) 55%, transparent);
+  color: color-mix(in srgb, var(--color-text) 72%, transparent);
   font-size: 12.5px;
   letter-spacing: 0.04em;
 }
@@ -88,6 +93,9 @@ defineProps<{
   display: flex;
   flex-direction: column;
   gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
 .job__urls a {

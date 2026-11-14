@@ -11,9 +11,17 @@ const parts = computed(() => splitRoles(value));
 </script>
 
 <template>
-  <p class="role-line">
+  <!-- lang="en" прибит статично: roleLine в en.ts и ru.ts — одна и та же
+       английская строка, и на русской странице её читает русский голос
+       (WCAG 3.1.2). На английской странице атрибут — no-op. Названия навыков
+       и ссылки-URL не помечаем: имена собственные и технические термины
+       из-под 3.1.2 выведены. -->
+  <p class="role-line" lang="en">
     <template v-for="part in parts" :key="part.text">
-      <span v-if="part.showSep" class="role-line__sep">|</span>
+      <!-- Декоративный глиф: иначе читается как «вертикальная черта». -->
+      <span v-if="part.showSep" class="role-line__sep" aria-hidden="true"
+        >|</span
+      >
       <span class="role-line__item">{{ part.text }}</span>
     </template>
   </p>

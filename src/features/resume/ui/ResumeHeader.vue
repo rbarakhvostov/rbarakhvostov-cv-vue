@@ -13,14 +13,16 @@ defineProps<{
     <div class="header__main">
       <h1 class="header__name">{{ name }}</h1>
       <RoleLine class="header__roles" :value="roleLine" />
-      <div class="header__contacts">
-        <template v-for="(contact, index) in contacts" :key="contact.href">
-          <span v-if="index > 0" class="header__sep">|</span>
+      <!-- role="list" возвращает семантику, которую Safari/VoiceOver снимает
+           при list-style: none. Разделитель «|» был текстом и читался вслух —
+           теперь это border-left у соседних li, то есть чистая декорация. -->
+      <ul class="header__contacts" role="list">
+        <li v-for="contact in contacts" :key="contact.href">
           <!-- rel="me" связывает страницу с профилями: по ней поисковик
                понимает, что это тот же человек, что в LinkedIn и GitHub. -->
           <a :href="contact.href" rel="me noopener">{{ contact.label }}</a>
-        </template>
-      </div>
+        </li>
+      </ul>
     </div>
   </header>
 </template>
@@ -57,9 +59,17 @@ defineProps<{
   flex-wrap: wrap;
   align-items: center;
   gap: 6px 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
   font-size: 13.5px;
   font-weight: 500;
   color: var(--color-role);
+}
+
+.header__contacts li + li {
+  padding-left: 12px;
+  border-left: 1px solid var(--color-divider);
 }
 
 .header__contacts a {
@@ -73,10 +83,6 @@ defineProps<{
   text-decoration-color: var(--color-accent);
 }
 
-.header__sep {
-  color: var(--color-divider);
-}
-
 @media screen and (width <= 640px) {
   .header__contacts {
     flex-direction: column;
@@ -84,8 +90,9 @@ defineProps<{
     gap: 8px;
   }
 
-  .header__sep {
-    display: none;
+  .header__contacts li + li {
+    padding-left: 0;
+    border-left: 0;
   }
 }
 </style>

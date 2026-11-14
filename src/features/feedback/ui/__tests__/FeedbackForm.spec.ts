@@ -49,7 +49,17 @@ describe('FeedbackForm', () => {
     expect(wrapper.find('label[for="feedback-message"]').text()).toContain(
       'Message',
     );
-    expect(wrapper.findAll('.feedback__required')).toHaveLength(2);
+    // Звёздочка декоративна — обязательность несёт required.
+    const markers = wrapper.findAll('.feedback__required');
+    expect(markers).toHaveLength(2);
+    markers.forEach((marker) => {
+      expect(marker.attributes('aria-hidden')).toBe('true');
+    });
+
+    expect(wrapper.find('#feedback-name').attributes('required')).toBeDefined();
+    expect(
+      wrapper.find('#feedback-message').attributes('required'),
+    ).toBeDefined();
     expect(wrapper.find('button[type="submit"]').text()).toBe('Send');
 
     wrapper.unmount();
@@ -66,6 +76,42 @@ describe('FeedbackForm', () => {
     expect(wrapper.text()).toContain('Please enter a message.');
     expect(fetch).not.toHaveBeenCalled();
     expect(findToast()).toBeNull();
+
+    wrapper.unmount();
+  });
+
+  // Валидация не поднимает тост, а ошибки не в live-region: без переноса
+  // фокуса сабмит пустой формы для скринридера прошёл бы беззвучно.
+  it('moves focus to the first invalid field on submit', async () => {
+    vi.stubGlobal('fetch', vi.fn());
+    const wrapper = mountForm();
+
+    await wrapper.find('form').trigger('submit');
+    await flushPromises();
+
+    const nameInput = wrapper.find('#feedback-name').element;
+    expect(document.activeElement).toBe(nameInput);
+    expect(wrapper.find('#feedback-name').attributes('aria-invalid')).toBe(
+      'true',
+    );
+    expect(wrapper.find('#feedback-name').attributes('aria-describedby')).toBe(
+      'feedback-name-error',
+    );
+
+    wrapper.unmount();
+  });
+
+  it('skips a valid field and focuses the next invalid one', async () => {
+    vi.stubGlobal('fetch', vi.fn());
+    const wrapper = mountForm();
+
+    await wrapper.find('#feedback-name').setValue('Ada Lovelace');
+    await wrapper.find('form').trigger('submit');
+    await flushPromises();
+
+    expect(document.activeElement).toBe(
+      wrapper.find('#feedback-message').element,
+    );
 
     wrapper.unmount();
   });

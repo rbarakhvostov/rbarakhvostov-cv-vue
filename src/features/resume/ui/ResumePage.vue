@@ -14,8 +14,11 @@ const { copy } = useResumeLocale();
 <template>
   <div class="page">
     <div class="page__inner">
+      <a class="skip-link" href="#main">{{ copy.skipToContent }}</a>
       <ResumeToolbar />
-      <main>
+      <!-- tabindex="-1": без него Safari переводит по якорю только прокрутку,
+           но не фокус, и Tab после скип-линка возвращается в начало страницы. -->
+      <main id="main" tabindex="-1">
         <ResumeHeader :name="copy.name" :role-line="copy.roleLine" />
         <ResumeSummary :summary="copy.summary" />
         <ExperienceSection :copy="copy" />
@@ -38,5 +41,38 @@ const { copy } = useResumeLocale();
   max-width: 1020px;
   margin: 0 auto;
   padding: clamp(26px, 5vw, 60px) clamp(20px, 5vw, 64px) 96px;
+}
+
+/* Скрыт, пока не получит фокус с клавиатуры. z-index выше слоя тоста (50),
+   чтобы всплывший тост не перекрыл ссылку. */
+.skip-link {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.skip-link:focus-visible {
+  position: fixed;
+  top: 12px;
+  left: 12px;
+  z-index: 60;
+  width: auto;
+  height: auto;
+  padding: 10px 16px;
+  overflow: visible;
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text);
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: var(--shadow-lg);
+  clip-path: none;
+}
+
+main:focus-visible {
+  outline: none;
 }
 </style>
