@@ -8,7 +8,6 @@ type SystemTheme = {
   setPrefersLight: (next: boolean) => void;
 };
 
-/** jsdom не реализует matchMedia — подменяем его управляемым стабом. */
 const stubSystemTheme = (prefersLight: boolean): SystemTheme => {
   const listeners = new Set<(event: MediaQueryListEvent) => void>();
   let matches = prefersLight;
@@ -45,7 +44,6 @@ const stubSystemTheme = (prefersLight: boolean): SystemTheme => {
 const resetThemeState = (): void => {
   localStorage.clear();
   document.documentElement.removeAttribute('data-theme');
-  // setTheme также снимает подписку на системную тему, оставшуюся от прошлого теста.
   useResumeTheme().setTheme('dark');
   localStorage.clear();
 };

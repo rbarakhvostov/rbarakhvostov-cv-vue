@@ -8,9 +8,6 @@ const LIGHT_QUERY = '(prefers-color-scheme: light)';
 
 const theme = ref<Theme>(FALLBACK_THEME);
 
-// Живёт столько же, сколько приложение: initResumeTheme() вызывается в main.ts
-// вне scope компонента, поэтому onScopeDispose тут неприменим. Подписка снимается
-// явно — в setTheme (пользователь сделал свой выбор) и при повторном init.
 let stopSystemThemeWatch: (() => void) | null = null;
 
 const isTheme = (value: string | null): value is Theme => {

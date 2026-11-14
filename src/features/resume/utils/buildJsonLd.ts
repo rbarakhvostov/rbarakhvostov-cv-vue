@@ -27,7 +27,6 @@ const getEmail = (): string | null => {
   return contact ? contact.href.slice(MAILTO.length) : null;
 };
 
-/** Профили на других площадках — то, по чему поисковик склеивает личность. */
 const getSameAs = (): readonly string[] => {
   return contacts
     .filter((contact) => !contact.href.startsWith(MAILTO))
@@ -50,10 +49,6 @@ const buildWorksFor = (): JsonLdNode | null => {
   };
 };
 
-/**
- * Схема собирается из тех же модулей, что и страница, поэтому не может
- * разъехаться с видимым содержимым — Google считает это спамом разметки.
- */
 export const buildJsonLd = (locale: Locale): JsonLdGraph => {
   const copy = getResumeCopy(locale);
   const alternate = getResumeCopy(otherLocale(locale));
@@ -66,7 +61,6 @@ export const buildJsonLd = (locale: Locale): JsonLdGraph => {
     '@type': 'Person',
     '@id': personId,
     name: copy.name,
-    // Связывает «Roman Barakhvostov» и «Роман Барахвостов» как одно лицо.
     alternateName: alternate.name,
     jobTitle: copy.roleLine,
     description: copy.summary,

@@ -63,9 +63,6 @@ describe('useResumeLocale', () => {
     expect(copy.value.name).toBe(getResumeCopy('ru').name);
   });
 
-  // Регрессия: раньше init сохранял локаль открытой страницы, поэтому заход
-  // на /ru/ записывал 'ru', а инлайн-скрипт потом вечно уводил с / обратно —
-  // английская версия становилась недостижимой.
   it('does not persist anything just because a page was opened', () => {
     visit('/ru/');
 
@@ -104,7 +101,6 @@ describe('useResumeLocale', () => {
     }).not.toThrow();
   });
 
-  // Пререндер вызывает setResumeLocale в Node, где никакого DOM нет.
   it('setResumeLocale touches no DOM', () => {
     document.title = 'untouched';
 

@@ -24,16 +24,8 @@ export default defineConfigWithVueTs(
     name: 'app/a11y-overrides',
     files: ['**/*.vue'],
     rules: {
-      // Плагин считает role="list" на <ul> избыточным по спецификации, и
-      // формально он прав. Но Safari/VoiceOver снимает семантику списка, когда
-      // у него list-style: none, а это все списки в проекте, — role возвращает
-      // её обратно. Отключаем правило целиком, а не точечными disable-строками:
-      // это позиция по проекту, а не исключение в одном месте.
       'vuejs-accessibility/no-redundant-roles': 'off',
 
-      // По умолчанию правило требует одновременно и обёртку, и for/id. Для
-      // связи достаточно одного: у полей формы это for/id, у ханипота —
-      // вложенность (ему id ни к чему, он aria-hidden и вне таб-порядка).
       'vuejs-accessibility/label-has-for': [
         'error',
         { required: { some: ['nesting', 'id'] } },
@@ -46,9 +38,6 @@ export default defineConfigWithVueTs(
     files: ['src/**/__tests__/*'],
   },
 
-  // SSR-энтри выполняется в Node во время сборки. Типами это не поймать:
-  // tsconfig без DOM пришлось бы применить ко всему графу импортов от App.vue,
-  // куда законно входят клиентские useResumeTheme / useResumeLocale.
   {
     name: 'app/ssr-entry',
     files: ['src/entry-server.ts'],
@@ -66,9 +55,6 @@ export default defineConfigWithVueTs(
 
   skipFormatting,
 
-  // Placed after skipFormatting so Prettier's config cannot switch them off.
-  // Prettier preserves blank lines but never inserts them, so the padding rule
-  // is ours to enforce.
   {
     name: 'app/code-style',
     files: ['**/*.{ts,mts,tsx,vue}'],

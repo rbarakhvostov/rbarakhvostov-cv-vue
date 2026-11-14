@@ -2,9 +2,7 @@
 type Option = {
   value: T;
   label?: string;
-  /** Опускается у ссылок: там роль подписи играет видимый текст. */
   ariaLabel?: string;
-  /** Задан — рендерится <a> вместо <button>. Нужен, чтобы краулер видел ссылку. */
   href?: string;
 };
 
@@ -13,7 +11,6 @@ defineSlots<{
 }>();
 
 const emit = defineEmits<{
-  /** Выбор пользователя. У ссылок `model` не меняется — переход делает браузер. */
   select: [value: T];
 }>();
 
@@ -21,12 +18,9 @@ const model = defineModel<T>({ required: true });
 
 const { options } = defineProps<{
   options: readonly Option[];
-  /** Имя группы для скринридера. Обязателен: role="group" без имени бесполезен. */
   label: string;
 }>();
 
-// Ссылка и кнопка расходятся не только тегом: aria-pressed на ссылке
-// неуместен, её выбранность выражает aria-current.
 const attrsFor = (option: Option): Record<string, unknown> => {
   const isOn = model.value === option.value;
 
@@ -34,7 +28,6 @@ const attrsFor = (option: Option): Record<string, unknown> => {
     return {
       href: option.href,
       hreflang: option.value,
-      // 'page', а не 'true': ссылка ведёт на текущую страницу.
       'aria-current': isOn ? 'page' : undefined,
     };
   }
@@ -110,23 +103,16 @@ const onSelect = (option: Option): void => {
   z-index: 1;
 }
 
-/* Кольцо, а не только оттенок: подложка даёт к соседнему сегменту всего
-   1.27:1, а WCAG 1.4.11 требует от индикатора состояния 3:1. --color-accent
-   против фона группы — 4.98:1 в тёмной теме и 5.79:1 в светлой. */
 .segmented__btn.is-on {
   background: color-mix(in srgb, var(--color-accent) 16%, transparent);
   color: var(--color-role);
   box-shadow: inset 0 0 0 1px var(--color-accent);
 }
 
-/* :not(.is-on) обязателен: у :hover та же специфичность (0,2,0), что и у
-   .is-on, и он идёт ниже — без этого ховер стирал выделение выбранного. */
 .segmented__btn:hover:not(.is-on) {
   background: color-mix(in srgb, var(--color-text) 7%, transparent);
 }
 
-/* В forced-colors и background, и color форсируются, так что выбранный
-   сегмент становится неотличим от соседнего. Highlight переживает режим. */
 @media (forced-colors: active) {
   .segmented__btn.is-on {
     border: 2px solid Highlight;

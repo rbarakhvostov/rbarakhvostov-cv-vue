@@ -15,7 +15,6 @@ describe('ResumePage', () => {
     const main = wrapper.get('main');
     expect(main.attributes('id')).toBe('main');
 
-    // Без tabindex Safari переносит по якорю прокрутку, но не фокус.
     expect(main.attributes('tabindex')).toBe('-1');
 
     wrapper.unmount();
@@ -30,8 +29,6 @@ describe('ResumePage', () => {
     wrapper.unmount();
   });
 
-  // Тулбар лежит вне <main>, поэтому без собственного лендмарка он выпадал
-  // из навигации по лендмаркам целиком.
   it('exposes the toolbar as a banner landmark outside <main>', () => {
     const wrapper = mount(ResumePage);
     const toolbar = wrapper.get('.toolbar');

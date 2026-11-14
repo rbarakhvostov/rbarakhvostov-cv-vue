@@ -22,8 +22,6 @@ describe('buildHead', () => {
     );
   });
 
-  // Обе страницы перечисляют обе версии и x-default — иначе Google
-  // считает связь односторонней и игнорирует её.
   it('declares the same three alternates on both pages', () => {
     for (const locale of ['en', 'ru'] as const) {
       const head = buildHead(locale);

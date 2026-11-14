@@ -15,8 +15,6 @@ export const en: ResumeCopy = {
   skipToContent: 'Skip to content',
   langGroupLabel: 'Language',
   themeGroupLabel: 'Theme',
-  // Кнопки темы иконочные, поэтому эти строки целиком составляют их доступное
-  // имя — без существительного «Light» ни о чём не говорит.
   lightLabel: 'Light theme',
   darkLabel: 'Dark theme',
   pdfLabel: 'Download CV as PDF',

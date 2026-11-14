@@ -13,13 +13,8 @@ defineProps<{
     <div class="header__main">
       <h1 class="header__name">{{ name }}</h1>
       <RoleLine class="header__roles" :value="roleLine" />
-      <!-- role="list" возвращает семантику, которую Safari/VoiceOver снимает
-           при list-style: none. Разделитель «|» был текстом и читался вслух —
-           теперь это border-left у соседних li, то есть чистая декорация. -->
       <ul class="header__contacts" role="list">
         <li v-for="contact in contacts" :key="contact.href">
-          <!-- rel="me" связывает страницу с профилями: по ней поисковик
-               понимает, что это тот же человек, что в LinkedIn и GitHub. -->
           <a :href="contact.href" rel="me noopener">{{ contact.label }}</a>
         </li>
       </ul>

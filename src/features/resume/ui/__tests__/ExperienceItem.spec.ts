@@ -44,8 +44,6 @@ describe('ExperienceItem', () => {
     wrapper.unmount();
   });
 
-  // list-style: none снимает семантику списка в Safari/VoiceOver — её
-  // возвращает явный role="list".
   it('keeps list semantics for bullets and job urls', () => {
     const wrapper = mount(ExperienceItem, {
       props: { job, roleLine: en.roleReactNext, bullets: en.jobs.alfa },

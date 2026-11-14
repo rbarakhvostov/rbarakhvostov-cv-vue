@@ -3,15 +3,6 @@ import { resolve } from 'node:path';
 
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 
-/**
- * Инлайн-скрипт из index.html — это единственная логика, которая не
- * импортируется приложением: он обязан отработать до первой отрисовки, пока
- * отложенный main.ts ещё не загружен. Здесь он вытаскивается из разметки и
- * исполняется с подменёнными глобалами, иначе таблица решений про редирект
- * осталась бы без покрытия — а именно в ней уже один раз жил баг, из-за
- * которого английская версия становилась недостижимой.
- */
-// Vitest запускается из корня проекта (там же лежит vitest.config.ts).
 const INDEX_HTML = resolve(process.cwd(), 'index.html');
 
 let source = '';
@@ -53,8 +44,6 @@ const run = ({
     },
   };
 
-  // Голые `location` / `localStorage` внутри скрипта разрешатся в эти
-  // параметры — подменять настоящие глобалы jsdom не нужно.
   const invoke = new Function(
     'location',
     'localStorage',
@@ -110,7 +99,6 @@ describe('инлайн-скрипт index.html', () => {
       expect(run({ languages: ['de-DE', 'fr'] }).replaced).toBeNull();
     });
 
-    // Регрессия: именно здесь английская версия становилась недостижимой.
     it('подчиняется сохранённому выбору EN даже в русском браузере', () => {
       expect(
         run({ languages: ['ru-RU'], stored: { 'rb-resume-lang': 'en' } })

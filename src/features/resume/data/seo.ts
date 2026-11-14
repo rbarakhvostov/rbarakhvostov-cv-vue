@@ -1,25 +1,18 @@
 import type { Locale, SeoCopy } from '../types';
 
-/**
- * Единственное место, где живёт продакшн-домен: сюда смотрят canonical,
- * hreflang, Open Graph, JSON-LD и sitemap. Переезд на свой домен — одна строка.
- */
 export const SITE_URL = 'https://roman-barakhvostov-cv.netlify.app';
 
 export const OG_IMAGE_PATH = '/og-image.png';
 export const OG_IMAGE_WIDTH = 1200;
 export const OG_IMAGE_HEIGHT = 630;
 
-/** Порядок важен: в этом же порядке пререндер обходит страницы и пишет sitemap. */
 export const LOCALES = ['en', 'ru'] as const satisfies readonly Locale[];
 
-/** Каждая локаль — отдельный проиндексированный URL, иначе hreflang не на что навесить. */
 export const LOCALE_PATHS = {
   en: '/',
   ru: '/ru/',
 } as const satisfies Record<Locale, string>;
 
-/** `x-default` указывает на версию для всех прочих языков. */
 export const DEFAULT_LOCALE: Locale = 'en';
 
 export const absoluteUrl = (path: string): string => `${SITE_URL}${path}`;

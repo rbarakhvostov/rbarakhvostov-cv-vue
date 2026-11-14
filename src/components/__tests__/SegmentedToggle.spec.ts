@@ -62,14 +62,10 @@ describe('SegmentedToggle', () => {
     expect(first?.attributes('aria-current')).toBe('page');
     expect(first?.classes()).toContain('is-on');
 
-    // На ссылке aria-pressed неуместен — роль выбранного несёт aria-current.
     expect(first?.attributes('aria-pressed')).toBeUndefined();
     expect(second?.attributes('href')).toBe('/ru/');
     expect(second?.attributes('aria-current')).toBeUndefined();
 
-    // Переход делает браузер: клик не должен менять модель и перерисовывать
-    // страницу на другом языке перед уходом с неё.
-    // preventDefault — чтобы jsdom не ругался на несуществующую навигацию.
     const swallowNavigation = (event: Event): void => {
       event.preventDefault();
     };
@@ -79,13 +75,9 @@ describe('SegmentedToggle', () => {
 
     expect(wrapper.emitted('update:modelValue')).toBeUndefined();
 
-    // …но о выборе всё равно сообщает: по этому событию запоминается язык.
     expect(wrapper.emitted('select')?.[0]).toEqual(['ru']);
   });
 
-  // Выделение выбранного сегмента держится на классе is-on: CSS в jsdom не
-  // считается, поэтому проверяем, что класс стоит ровно на одном сегменте и
-  // переезжает вместе с выбором.
   it('marks exactly one segment as selected', async () => {
     const wrapper = mount(SegmentedToggle, {
       props: { modelValue: 'en', options, label: 'Language' },

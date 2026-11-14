@@ -18,8 +18,6 @@ export const useFeedbackForm = () => {
   const errorReason = ref<FeedbackErrorReason | null>(null);
   const fieldErrors = ref<FeedbackFieldErrors>({ name: false, message: false });
 
-  // Clear a field's error as soon as it becomes valid again. This only ever
-  // removes errors — typing must not raise new ones before the next submit.
   watch([name, message], ([nextName, nextMessage]) => {
     const current = fieldErrors.value;
 

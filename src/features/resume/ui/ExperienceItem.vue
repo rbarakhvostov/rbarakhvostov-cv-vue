@@ -12,8 +12,6 @@ defineProps<{
 </script>
 
 <template>
-  <!-- Без aria-labelledby все четыре article безымянны, и скринридер
-       объявляет их как «статья» без указания компании. -->
   <article
     class="job"
     :class="{ 'is-first': isFirst }"
@@ -32,7 +30,6 @@ defineProps<{
     </div>
     <div class="job__body">
       <RoleLine class="job__role" :value="roleLine" />
-      <!-- role="list": list-style: none снимает семантику списка в Safari/VO. -->
       <ul class="job__bullets" role="list">
         <li v-for="bullet in bullets" :key="bullet">
           <template
@@ -89,8 +86,6 @@ defineProps<{
   letter-spacing: 0.04em;
 }
 
-/* gap 6px, а не 4: при 4px центры соседних ссылок расходятся на 23.4px, а
-   WCAG 2.5.8 требует 24. Совпадает с gap у .header__contacts. */
 .job__urls {
   display: flex;
   flex-direction: column;
@@ -164,9 +159,6 @@ defineProps<{
   }
 }
 
-/* Градиенты режим не форсирует, поэтому верхняя граница осталась бы серой
-   полосой из тёмной темы поверх Canvas; тире маркеров нарисованы background,
-   а он форсируется в Canvas и исчезает вместе с ними. */
 @media (forced-colors: active) {
   .job {
     background: none;

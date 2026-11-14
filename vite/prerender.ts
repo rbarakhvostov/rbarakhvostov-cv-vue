@@ -4,7 +4,6 @@ import { pathToFileURL } from 'node:url';
 
 import { build, type Plugin, type ResolvedConfig } from 'vite';
 
-/** Зеркало `PrerenderedPage` из `src/entry-server.ts`. */
 type PrerenderedPage = {
   route: string;
   lang: string;
@@ -64,11 +63,9 @@ const assertContains = (template: string, needle: string): void => {
   }
 };
 
-/**
- * Замена функцией, а не строкой: в строковой замене `$&`, `` $` `` и `$'`
- * — управляющие последовательности. Одна строчка опыта вида «сэкономил $5
- * млн» молча перекорёжила бы разметку.
- */
+// Замена функцией, а не строкой: в строковой замене `$&`, `` $` `` и `$'` —
+// управляющие последовательности, и строка опыта вида «сэкономил $5 млн»
+// молча перекорёжила бы разметку.
 const replaceOnce = (
   template: string,
   marker: string,
@@ -77,12 +74,6 @@ const replaceOnce = (
   return template.replace(marker, () => value);
 };
 
-/**
- * `<title>` в index.html нужен только для `npm run dev`. В сборке рядом с ним
- * встал бы пререндеренный заголовок, а браузер и Google берут первый, поэтому
- * вырезаем его вместе с отступом — не полагаясь на то, как Prettier его
- * отформатировал.
- */
 const stripDevTitle = (template: string): string => {
   const start = template.indexOf(TITLE_OPEN);
   const close = template.indexOf(TITLE_CLOSE, start) + TITLE_CLOSE.length;
@@ -116,21 +107,12 @@ const loadServerEntry = async (root: string): Promise<ServerEntry> => {
   return loaded;
 };
 
-/**
- * Собирает статический HTML на каждую локаль после обычной клиентской сборки.
- *
- * Почему плагин, а не отдельный npm-скрипт: CI гоняет `build-only`, а Netlify —
- * `build`. Скрипт, подвешенный к одному из них, во втором молча не выполнится.
- * Внутри `vite build` все точки входа ведут себя одинаково по построению.
- */
 export const prerender = (): Plugin => {
   let config: ResolvedConfig;
 
   return {
     name: 'rb-prerender',
 
-    // Не `apply: 'build'`: вложенная SSR-сборка ниже — тоже `build`, и плагин
-    // запустил бы сам себя. `isSsrBuild` — ровно тот дискриминатор, что нужен.
     apply: (_config, env) => env.command === 'build' && !env.isSsrBuild,
 
     configResolved(resolved) {
@@ -143,8 +125,6 @@ export const prerender = (): Plugin => {
 
       await build({
         root,
-        // Тот же mode, что и у клиентской сборки: иначе `import.meta.env`
-        // в общих модулях разошёлся бы между разметкой и бандлом.
         mode: config.mode,
         logLevel: 'warn',
         build: { ssr: SSR_ENTRY, outDir: SSR_OUT_DIR },

@@ -3,7 +3,6 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import FeedbackForm from '../FeedbackForm.vue';
 
-// The toast teleports into <body>, so it lives outside the wrapper's tree.
 const findToast = (): HTMLElement | null => {
   return document.body.querySelector('.feedback-toast');
 };
@@ -49,7 +48,6 @@ describe('FeedbackForm', () => {
     expect(wrapper.find('label[for="feedback-message"]').text()).toContain(
       'Message',
     );
-    // Звёздочка декоративна — обязательность несёт required.
     const markers = wrapper.findAll('.feedback__required');
     expect(markers).toHaveLength(2);
     markers.forEach((marker) => {
@@ -80,8 +78,6 @@ describe('FeedbackForm', () => {
     wrapper.unmount();
   });
 
-  // Валидация не поднимает тост, а ошибки не в live-region: без переноса
-  // фокуса сабмит пустой формы для скринридера прошёл бы беззвучно.
   it('moves focus to the first invalid field on submit', async () => {
     vi.stubGlobal('fetch', vi.fn());
     const wrapper = mountForm();
@@ -126,8 +122,6 @@ describe('FeedbackForm', () => {
     expect(toast).not.toBeNull();
     expect(toast?.classList.contains('feedback-toast--success')).toBe(true);
     expect(toast?.textContent).toContain('Thanks! Your message has been sent.');
-    // Тост живёт внутри формы, поэтому из печати его убирает собственный
-    // data-print-hide, а не телепорт за пределы секции.
     expect(
       wrapper.find('.feedback-toast-layer').attributes('data-print-hide'),
     ).toBeDefined();
@@ -135,9 +129,6 @@ describe('FeedbackForm', () => {
     wrapper.unmount();
   });
 
-  // Регрессия, которую не ловил ни один тест: пока тост телепортировался в
-  // <body>, в собранной странице он оказывался ПЕРЕД #app, и от Send до его
-  // mailto-ссылки было ~19 Shift+Tab назад через всю страницу.
   it('places the toast after the submit button in DOM order', async () => {
     stubSubmitResponse({ success: false, message: 'bad key' });
 

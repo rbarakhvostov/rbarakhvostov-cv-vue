@@ -1,13 +1,3 @@
-/**
- * Генерирует public/og-image.png (1200×630) и public/apple-touch-icon.png (180×180).
- *
- * Запускается руками и только при смене имени, роли или палитры:
- *
- *   node scripts/build-og-image.mjs
- *
- * Результат коммитится в репозиторий. В сборку скрипт намеренно не входит —
- * так ни Chrome, ни новых зависимостей в CI и на Netlify не требуется.
- */
 import { mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
@@ -24,8 +14,6 @@ const CHROME =
 const root = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const publicDir = join(root, 'public');
 
-// Значения продублированы из src/assets/styles/tokens.css: карточка рендерится
-// вне приложения, CSS-переменные сюда не дотягиваются.
 const COLORS = {
   bg: '#161826',
   surface: '#232532',
@@ -151,7 +139,6 @@ const shoot = async (workDir, html, name, width, height) => {
     '--force-device-scale-factor=1',
     `--window-size=${width},${height}`,
     `--screenshot=${join(publicDir, `${name}.png`)}`,
-    // Шрифты и SVG тянутся по сети/с диска — даём странице время отрисоваться.
     '--virtual-time-budget=6000',
     pathToFileURL(page).href,
   ]);

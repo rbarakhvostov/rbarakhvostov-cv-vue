@@ -12,8 +12,6 @@ const mountHeader = () => {
 };
 
 describe('ResumeHeader', () => {
-  // Раньше это был div со <span>|</span> между ссылками: скринридер не
-  // сообщал о количестве контактов и зачитывал разделитель вслух.
   it('renders contacts as a list', () => {
     const wrapper = mountHeader();
     const list = wrapper.get('.header__contacts');

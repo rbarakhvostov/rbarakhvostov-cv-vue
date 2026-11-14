@@ -34,7 +34,6 @@ describe('buildJsonLd', () => {
     expect(person.description).toBe(copy.summary);
   });
 
-  // Именно alternateName связывает «Roman Barakhvostov» и «Роман Барахвостов».
   it('cross-links the two spellings of the name', () => {
     expect(findNode('en', 'Person').alternateName).toBe(
       getResumeCopy('ru').name,

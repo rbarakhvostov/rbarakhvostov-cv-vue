@@ -15,10 +15,6 @@ import PdfDownloadLink from './PdfDownloadLink.vue';
 const { locale, copy } = useResumeLocale();
 const { theme, setTheme } = useResumeTheme();
 
-// Настоящие ссылки, а не кнопки: так краулер находит вторую языковую версию,
-// а пользователь получает рабочие «назад» и «открыть в новой вкладке».
-// Видимый текст EN/RU сам по себе достаточная подпись — aria-label тут только
-// перекрыл бы его для скринридера.
 const langOptions = [
   { value: 'en', label: 'EN', href: LOCALE_PATHS.en },
   { value: 'ru', label: 'RU', href: LOCALE_PATHS.ru },
@@ -38,9 +34,6 @@ const themeOptions = computed(
 </script>
 
 <template>
-  <!-- <header>, а не <div>: тулбар лежит вне <main>, и только так он попадает
-       в лендмарк banner — иначе навигация по лендмаркам пропускает его целиком.
-       <header> внутри ResumeHeader вложен в <main> и остаётся generic. -->
   <header class="toolbar" data-print-hide>
     <div class="toolbar__group">
       <PdfDownloadLink :locale="locale" />
@@ -127,7 +120,6 @@ const themeOptions = computed(
   flex: none;
 }
 
-/* Разделитель нарисован background, который форсируется в Canvas. */
 @media (forced-colors: active) {
   .toolbar__divider {
     background: CanvasText;

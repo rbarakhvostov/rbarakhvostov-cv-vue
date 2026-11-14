@@ -24,8 +24,6 @@ const mailtoHref = computed(
 const { name, message, botcheck, status, errorReason, fieldErrors, submit } =
   useFeedbackForm();
 
-// 'validation' stays inline under the offending field and is announced by
-// moving focus there, so it maps to null instead of raising a toast.
 const errorCopyFor = (reason: FeedbackErrorReason | null): string | null => {
   switch (reason) {
     case 'missing-key':
@@ -44,10 +42,6 @@ const submitButton = useTemplateRef<HTMLButtonElement>('submit-button');
 const nameInput = useTemplateRef<HTMLInputElement>('name-input');
 const messageInput = useTemplateRef<HTMLTextAreaElement>('message-input');
 
-// Валидация намеренно не поднимает тост, а инлайн-ошибки не живут в
-// live-region — без переноса фокуса сабмит пустой формы для скринридера
-// выглядел бы как полное отсутствие реакции. На сфокусированном поле он
-// зачитает подпись, aria-invalid и текст ошибки через aria-describedby.
 const focusFirstInvalid = (): void => {
   if (fieldErrors.value.name) {
     nameInput.value?.focus();
@@ -58,8 +52,6 @@ const focusFirstInvalid = (): void => {
   messageInput.value?.focus();
 };
 
-// `status` never returns to 'idle', so an identical outcome twice in a row is
-// not a reactive change — await the submission instead of watching the status.
 const onSubmit = async (): Promise<void> => {
   await submit();
 
@@ -86,9 +78,6 @@ const onSubmit = async (): Promise<void> => {
   }
 };
 
-// Закрытие убирает из DOM элемент, на котором стоял фокус, — вернуть его надо
-// вручную, иначе он утечёт на <body>. Только при явном закрытии: таймер фокус
-// трогать не должен.
 const onToastClose = (): void => {
   toast.value = null;
   submitButton.value?.focus({ preventScroll: true });
@@ -119,7 +108,6 @@ const onToastClose = (): void => {
         <div class="feedback__field">
           <label class="feedback__label" for="feedback-name">
             {{ copy.nameLabel }}
-            <!-- Обязательность несёт required; «*» читался бы как «звёздочка». -->
             <span class="feedback__required" aria-hidden="true">*</span>
           </label>
           <input
@@ -315,9 +303,6 @@ const onToastClose = (): void => {
   background: color-mix(in srgb, var(--color-accent) 16%, transparent);
 }
 
-/* Карточку очерчивает box-shadow, а линейку — градиент: первый режим
-   форсирует в none, второй не трогает вовсе, и форма теряет визуальную
-   группировку. */
 @media (forced-colors: active) {
   .feedback__card {
     border: 1px solid CanvasText;

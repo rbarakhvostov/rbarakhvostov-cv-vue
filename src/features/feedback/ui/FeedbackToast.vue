@@ -3,9 +3,6 @@ import { onScopeDispose, ref, watch } from 'vue';
 
 import type { FeedbackToast, FeedbackToastTone } from '../types';
 
-// null — не закрывать по таймеру. В тосте ошибки лежит запасная mailto-ссылка,
-// и прежние 8 секунд не гарантировали, что до неё успеют добраться: пауза
-// срабатывает только на hover/focus (WCAG 2.2.1).
 const DURATIONS: Record<FeedbackToastTone, number | null> = {
   success: 5000,
   error: null,
@@ -17,9 +14,7 @@ const { toast } = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  /** The auto-dismiss window elapsed. */
   dismiss: [];
-  /** The reader closed the toast explicitly. */
   close: [];
 }>();
 
@@ -56,12 +51,8 @@ const resume = (): void => {
   }
 };
 
-// Bumped per toast so that an identical outcome twice in a row replaces the
-// element instead of reusing it — otherwise the enter animation never replays.
 const renderKey = ref(0);
 
-// The form hands over a fresh object on every result, so an identical outcome
-// twice in a row still restarts the timer.
 watch(
   () => toast,
   (next) => {
@@ -75,7 +66,6 @@ watch(
 
     const duration = DURATIONS[next.tone];
 
-    // remaining = 0 заодно обезвреживает resume() после hover по такому тосту.
     if (duration === null) {
       clear();
       remaining = 0;
@@ -91,10 +81,6 @@ onScopeDispose(clear);
 </script>
 
 <template>
-  <!-- Без Teleport намеренно: слой фиксированный, но в DOM стоит сразу за
-       формой, поэтому с кнопки Send до ссылки в тосте — один Tab. Телепорт в
-       <body> ставил его ПЕРЕД #app (гидратация требует якоря первым узлом),
-       и до вечного тоста ошибки приходилось идти ~19 Shift+Tab назад. -->
   <div
     class="feedback-toast-layer"
     data-print-hide
@@ -102,12 +88,7 @@ onScopeDispose(clear);
     aria-live="polite"
     aria-atomic="true"
   >
-    <!-- out-in: a replacement must not sit beside the outgoing toast. -->
     <Transition name="feedback-toast" mode="out-in">
-      <!-- Правило ждёт роль и клавиатурный обработчик, но эти четыре
-             листенера ничего не активируют: они лишь ставят на паузу
-             автозакрытие, пока указатель или фокус внутри. Это сама по себе
-             мера доступности, а не интерактивность, требующая роли. -->
       <!-- eslint-disable-next-line vuejs-accessibility/no-static-element-interactions -->
       <div
         v-if="toast"
@@ -159,8 +140,6 @@ onScopeDispose(clear);
   justify-content: center;
   padding: 0 16px
     calc(clamp(16px, 4vw, 32px) + env(safe-area-inset-bottom, 0px));
-
-  /* The layer spans the viewport, so it must not swallow page clicks. */
   pointer-events: none;
 }
 
@@ -232,10 +211,6 @@ onScopeDispose(clear);
   opacity: 0;
 }
 
-/* На узком экране тост шире кнопки Send и накрыл бы её целиком, пока на ней
-   стоит фокус (WCAG 2.4.11). В потоке он встаёт сразу под формой — ровно там,
-   где и лежит в DOM, — и перекрывать ему уже нечего. На десктопе проблемы нет:
-   тост шириной 440px отцентрован, а Send прижата к левому краю карточки. */
 @media screen and (width <= 640px) {
   .feedback-toast-layer {
     position: static;
@@ -243,10 +218,6 @@ onScopeDispose(clear);
   }
 }
 
-/* Контур тоста держится на box-shadow, а его режим форсирует в none —
-   остался бы текст без рамки поверх Canvas. Цвет полосы тона тоже
-   форсируется, так что успех и ошибка в этом режиме неразличимы по цвету;
-   смысл несёт текст сообщения. */
 @media (forced-colors: active) {
   .feedback-toast {
     border: 1px solid CanvasText;

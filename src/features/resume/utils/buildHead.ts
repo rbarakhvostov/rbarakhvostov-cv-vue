@@ -13,8 +13,6 @@ import type { Locale } from '../types';
 import { buildJsonLd } from './buildJsonLd';
 import { escapeHtml, escapeJsonLd } from './escapeHtml';
 
-// Цвета продублированы из tokens.css: meta[theme-color] читает браузер до того,
-// как загрузится CSS, поэтому через переменную его не задать.
 const THEME_COLORS = {
   dark: '#161826',
   light: '#f3f5fe',
@@ -40,10 +38,6 @@ const preloadFont = (file: string): string => {
   );
 };
 
-/**
- * Латиница нужна обеим локалям — на русской странице по-английски написаны
- * роли и названия технологий. Кириллицу грузим только там, где она есть.
- */
 const buildFontPreloads = (locale: Locale): readonly string[] => {
   const preloads = [preloadFont('inter-latin.woff2')];
 
@@ -73,10 +67,6 @@ const buildAlternates = (): readonly string[] => {
   ];
 };
 
-/**
- * Весь `<head>`, зависящий от локали, одной строкой — её подставляет
- * пререндер-плагин в маркер `<!--app-head-->`.
- */
 export const buildHead = (locale: Locale): string => {
   const copy = getResumeCopy(locale);
   const seo = getSeoCopy(locale);
@@ -131,10 +121,6 @@ export const buildHead = (locale: Locale): string => {
 const SITEMAP_HEADER =
   '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">';
 
-/**
- * Каждая запись перечисляет все языковые версии — так Яндекс и Google
- * понимают, что это одна страница на двух языках, а не дубль.
- */
 export const buildSitemap = (lastmod: string): string => {
   const alternates = [
     ...LOCALES.map(
