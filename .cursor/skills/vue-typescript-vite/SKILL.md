@@ -11,7 +11,7 @@ Follow these practices for all Vue 3 + TypeScript + Vite work in this repo. Pref
 
 This project is Vue 3.5+, Vite 8, TypeScript (strict, `noUncheckedIndexedAccess`), `@` → `src`, and `vue-tsc --build` for type-checking. Match that stack.
 
-This is a **static, single-page resume app** (see `README.md`): one screen, no backend, resume content lives in local TS modules. Features today: `resume` and `feedback`. Deliberately no router, no Pinia, and no HTTP client library — don't add them speculatively. The only network call is the feedback form: one `fetch` POST of `FormData` to Web3Forms (`features/feedback`). Global state (locale, theme) is module-scope `ref`s inside composables. Both resolve from `localStorage`, otherwise from the system (`navigator.languages`, `prefers-color-scheme`), otherwise `en` and `dark`. Until the visitor picks a theme, it keeps following `prefers-color-scheme`; an explicit choice stops that. Locale is resolved once at startup and does not follow the system afterward. Only add a router / store / query library / VueUse / HTTP wrapper when a real requirement needs it, and prefer the smallest solution first.
+This is a **static, single-page resume app** (see `README.md`): one screen, no backend, resume content lives in local TS modules. Features today: `resume` and `feedback`. Deliberately no router, no Pinia, and no HTTP client library — don't add them speculatively. The only network call is the feedback form: one `fetch` POST of `FormData` to Web3Forms (`features/feedback`). There are two pages but no router: the build prerenders the same app into `dist/index.html` (EN) and `dist/ru/index.html` (RU) — search engines otherwise receive an empty `#app`. **Locale comes from the URL** (`/` → en, `/ru/` → ru), not from state: the language switch is plain links. Theme is a module-scope `ref` in a composable, resolved from `localStorage`, otherwise `prefers-color-scheme`, otherwise `dark`; until the visitor picks one explicitly it keeps following the system. Only add a router / store / query library / VueUse / HTTP wrapper when a real requirement needs it, and prefer the smallest solution first.
 
 ## Non-negotiables
 
@@ -56,7 +56,7 @@ Actual current layout — match it for new code, don't invent `router/`, `stores
 
 ```
 src/
-  assets/styles/           # tokens.css, base.css
+  assets/styles/           # tokens.css, base.css (+ the Inter @font-face rules)
   components/              # shared, presentational UI only (no feature logic)
   features/<name>/         # feature module
     composables/           # feature-scoped composables (+ __tests__)
@@ -66,7 +66,12 @@ src/
     utils/                 # pure functions (+ __tests__)
     types.ts               # feature's shared types
   App.vue
-  main.ts
+  main.ts                  # client bootstrap (hydration)
+  entry-server.ts          # SSR entry: renders both locales for the prerender
+vite/
+  prerender.ts             # build plugin: writes dist/ru/index.html and sitemap.xml
+scripts/
+  build-og-image.mjs       # one-off og-image.png generation, run by hand
 ```
 
 - Import via `@/` (`@/features/resume/data/jobs`).
@@ -190,13 +195,17 @@ export const usePointer = (target: MaybeRefOrGetter<HTMLElement | null>) => {
 
 - **Local UI state** lives in the component. Feedback fields, field errors, and toast status live in `useFeedbackForm` because the submit flow is what its tests cover — still one composable, not a store.
 - **Small global client state** (locale, theme) → module-scope `ref`/`computed` in a composable, exported as a singleton (see `useResumeLocale`, `useResumeTheme`). Every call site shares the same instance. Wrap `localStorage` reads/writes in try/catch and fall back to a sane default (private-browsing mode can throw). An empty `catch` is only for that known failure, and it needs a comment saying why.
-- Resolution order for both: stored choice, otherwise the system (`navigator.languages` for locale, `prefers-color-scheme` for theme), otherwise `en` / `dark`. `setTheme` persists the choice and unsubscribes from the system theme. `setLocale` persists the choice; locale does not keep following the system after startup. Storage keys are `rb-resume-lang` and `rb-resume-theme`.
+- Locale resolution is `localeFromPath(location.pathname)` — the URL wins, full stop. Persisting is a separate concern: `rememberLocale()` runs on an explicit toggle click, and that stored value is the only thing the inline redirect below reads. Theme resolution is: stored choice, otherwise `prefers-color-scheme`, otherwise `dark`; `setTheme` persists it and unsubscribes from the system theme. Storage keys are `rb-resume-lang` and `rb-resume-theme`.
 - The system-theme listener is created from `initResumeTheme()` in `main.ts`, outside any component scope, so `onScopeDispose` does not apply. Remove it explicitly in `setTheme` and on a repeated init.
-- Before first paint, an inline script in `index.html` sets `html[data-theme]` and `html[lang]` with the same rules and the same storage keys. `main.ts` is deferred; without that script a light or Russian first visit would flash dark English. Keep the script and the composables in lockstep.
-- There is no router: the app is a single screen (`App.vue` → `ResumePage`). Don't add Vue Router for what is still one page.
+- Before first paint, an inline script in `index.html` sets `html[data-theme]` with the same rules and storage key as `useResumeTheme` — `main.ts` is deferred, and without it a light first visit would flash dark. Keep the two in lockstep.
+- The same script decides whether to send `/` to `/ru/`: by the stored choice, or — when nothing has been chosen yet — by `navigator.languages`. Two invariants must hold: redirect **only from the root** (`/ru/` is an explicitly requested address), and consult `navigator` **only when nothing is stored**. Without the second one a Russian-locale browser could never reach the English version — the redirect fires before the deferred `main.ts` can run. The script never touches `html[lang]`; the prerender sets it.
+- That decision table is covered by `composables/__tests__/inlineBootstrap.spec.ts`, which extracts the script straight out of `index.html` and runs it against stubbed globals. Change the script, change the test.
+- There is no router, and two URLs don't need one: Netlify serves `dist/index.html` and `dist/ru/index.html` as static files, and `localeFromPath(location.pathname)` tells the app which locale it is rendering. A third locale is one entry in `LOCALE_PATHS` (`features/resume/data/seo.ts`) and one in `LOCALES` (`entry-server.ts`) — not Vue Router.
+- The language switch renders `<a href>`, not buttons: a crawler has to see the link to the other version. It never mutates locale state; the browser navigates, and the click is reported through a `select` event that `rememberLocale` persists.
+- `initResumeLocale` **persists nothing** — it only reads the URL. Writing the opened page's locale there is a trap: the inline script redirects away from `/` based on the stored value, so one visit to `/ru/` would lock the English version out forever. Only `rememberLocale` writes, i.e. only an explicit click.
 - If cross-feature state genuinely outgrows a composable (many independent consumers, complex derived state), promote it to a Pinia setup store instead of growing an ad-hoc module singleton.
 - Resume content is static TS under `features/resume/data/`. The feedback form is a one-shot `fetch` (`status` / `errorReason` refs), not cached server state. If the app ever loads remote data onto the screen, use a query library for that cache — don't hand-roll fetch+cache in a composable or store.
-- App bootstrap in `main.ts`: run side-effect inits that must land before first paint (`initResumeTheme()`, `initResumeLocale()`) → `createApp(App).mount('#app')`. Add `app.use(...)` calls only when a plugin (router, Pinia, etc.) actually exists.
+- Bootstrap in `main.ts` is **`initResumeLocale()` → `mount()` → `initResumeTheme()`**, and the order is not stylistic. Locale comes from the URL and is what the server rendered, so it must land before hydration. Theme is only knowable on the client: setting it before `mount` makes the client vnode disagree with the markup, and Vue **does not re-apply `class` during hydration** (it rides a separate patch flag and never reaches `dynamicProps`) — the theme toggle would highlight "dark" forever, with no warning in production. After `mount` it is an ordinary reactive update that flushes in a microtask, i.e. before paint. Add `app.use(...)` calls only when a plugin actually exists.
 - Visit counts are a GoatCounter script tag at the end of `index.html` (`count.v5.js` with an `integrity` hash). It is not an npm dependency, not a composable, and not an env var. Don't fold it into the Vue app.
 
 ## Vite and TypeScript
@@ -207,6 +216,10 @@ export const usePointer = (target: MaybeRefOrGetter<HTMLElement | null>) => {
 - Prefer official Vite plugins. Do not add webpack-era loaders or `vite-plugin-vue2`.
 - Code-split heavy widgets (if any appear) with `() => import(...)` or `defineAsyncComponent`.
 - Production check: `npm run build` must pass `vue-tsc --build` and the Vite build.
+- Prerendering is a `closeBundle` plugin (`vite/prerender.ts`), not a separate npm script: CI runs `build-only` and Netlify runs `build`, so a script chained to one of them silently skips in the other. `apply: (_, env) => env.command === 'build' && !env.isSsrBuild` keeps it from invoking itself. No `package.json` script changes are needed.
+- The plugin imports nothing from `src/`: `entry-server.ts` hands it finished strings (`head`, `html`, `teleports`) and it substitutes them. That keeps `src/` files out of the node tsconfig project, which has no DOM libs.
+- Substitution uses `String.replace` with a **function** replacement — in a string replacement `$&`, `` $` `` and `$'` are control sequences, so a bullet like "saved $5M" would silently mangle the markup. The markers are `<!--app-head-->`, `<!--app-html-->` and `<!--app-teleports-->` markers. Never pretty-print the result: one stray newline inside `#app` is a hydration text-node mismatch, which is why `dist` stays in `.prettierignore`.
+- `<Teleport to="body">` anchors (the toast layer in `FeedbackToast`) must be the **first node in `<body>`** — `hydrateTeleport` starts from `target.firstChild`. The plugin therefore swallows everything between `<body>` and the marker. A whitespace text node or a comment in front of them makes the layer hydrate on top of `#app`.
 
 ## Quality bar before finishing a change
 

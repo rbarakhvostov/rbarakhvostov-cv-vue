@@ -1,31 +1,70 @@
 <script setup lang="ts" generic="T extends string">
+type Option = {
+  value: T;
+  label?: string;
+  /** Опускается у ссылок: там роль подписи играет видимый текст. */
+  ariaLabel?: string;
+  /** Задан — рендерится <a> вместо <button>. Нужен, чтобы краулер видел ссылку. */
+  href?: string;
+};
+
 defineSlots<{
-  default?: (props: {
-    option: { value: T; label?: string; ariaLabel: string };
-  }) => unknown;
+  default?: (props: { option: Option }) => unknown;
+}>();
+
+const emit = defineEmits<{
+  /** Выбор пользователя. У ссылок `model` не меняется — переход делает браузер. */
+  select: [value: T];
 }>();
 
 const model = defineModel<T>({ required: true });
 
 const { options } = defineProps<{
-  options: readonly { value: T; label?: string; ariaLabel: string }[];
+  options: readonly Option[];
 }>();
+
+// Ссылка и кнопка расходятся не только тегом: aria-pressed на ссылке
+// неуместен, её выбранность выражает aria-current.
+const attrsFor = (option: Option): Record<string, unknown> => {
+  const isOn = model.value === option.value;
+
+  if (option.href) {
+    return {
+      href: option.href,
+      hreflang: option.value,
+      'aria-current': isOn ? 'true' : undefined,
+    };
+  }
+
+  return {
+    type: 'button',
+    'aria-pressed': isOn,
+    'aria-label': option.ariaLabel,
+  };
+};
+
+const onSelect = (option: Option): void => {
+  if (!option.href) {
+    model.value = option.value;
+  }
+
+  emit('select', option.value);
+};
 </script>
 
 <template>
   <div class="segmented" role="group">
-    <button
+    <component
+      :is="option.href ? 'a' : 'button'"
       v-for="option in options"
       :key="option.value"
-      type="button"
       class="segmented__btn"
       :class="{ 'is-on': model === option.value }"
-      :aria-pressed="model === option.value"
-      :aria-label="option.ariaLabel"
-      @click="model = option.value"
+      v-bind="attrsFor(option)"
+      @click="onSelect(option)"
     >
       <slot :option="option">{{ option.label }}</slot>
-    </button>
+    </component>
   </div>
 </template>
 
@@ -51,6 +90,7 @@ const { options } = defineProps<{
   font: inherit;
   font-size: 12.5px;
   letter-spacing: 0.04em;
+  text-decoration: none;
   cursor: pointer;
 }
 

@@ -15,11 +15,13 @@ const { copy } = useResumeLocale();
   <div class="page">
     <div class="page__inner">
       <ResumeToolbar />
-      <ResumeHeader :name="copy.name" :role-line="copy.roleLine" />
-      <ResumeSummary :summary="copy.summary" />
-      <ExperienceSection :copy="copy" />
-      <SkillsSection :heading="copy.skillsHeading" />
-      <FeedbackForm />
+      <main>
+        <ResumeHeader :name="copy.name" :role-line="copy.roleLine" />
+        <ResumeSummary :summary="copy.summary" />
+        <ExperienceSection :copy="copy" />
+        <SkillsSection :heading="copy.skillsHeading" />
+        <FeedbackForm />
+      </main>
     </div>
   </div>
 </template>

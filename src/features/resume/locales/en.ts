@@ -14,6 +14,7 @@ export const en: ResumeCopy = {
   roleVue: 'Software Engineer | Vue Frontend Developer',
   lightLabel: 'Light',
   darkLabel: 'Dark',
+  pdfLabel: 'Download CV as PDF',
   jobs: {
     alfa: [
       'Built a custom platform for bank operators that cut operational overhead by over 50% and sped up client request processing',

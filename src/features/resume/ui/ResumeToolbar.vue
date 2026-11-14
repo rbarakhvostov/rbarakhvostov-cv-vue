@@ -3,21 +3,29 @@ import { computed } from 'vue';
 
 import SegmentedToggle from '@/components/SegmentedToggle.vue';
 
-import { useResumeLocale } from '../composables/useResumeLocale';
+import {
+  rememberLocale,
+  useResumeLocale,
+} from '../composables/useResumeLocale';
 import { useResumeTheme } from '../composables/useResumeTheme';
+import { LOCALE_PATHS } from '../data/seo';
 import type { Locale, Theme } from '../types';
 import PdfDownloadLink from './PdfDownloadLink.vue';
 
-const { locale, setLocale, copy } = useResumeLocale();
+const { locale, copy } = useResumeLocale();
 const { theme, setTheme } = useResumeTheme();
 
+// Настоящие ссылки, а не кнопки: так краулер находит вторую языковую версию,
+// а пользователь получает рабочие «назад» и «открыть в новой вкладке».
+// Видимый текст EN/RU сам по себе достаточная подпись — aria-label тут только
+// перекрыл бы его для скринридера.
 const langOptions = [
-  { value: 'en', label: 'EN', ariaLabel: 'English' },
-  { value: 'ru', label: 'RU', ariaLabel: 'Русский' },
+  { value: 'en', label: 'EN', href: LOCALE_PATHS.en },
+  { value: 'ru', label: 'RU', href: LOCALE_PATHS.ru },
 ] as const satisfies readonly {
   value: Locale;
   label: string;
-  ariaLabel: string;
+  href: string;
 }[];
 
 const themeOptions = computed(
@@ -38,7 +46,7 @@ const themeOptions = computed(
       <SegmentedToggle
         :model-value="locale"
         :options="langOptions"
-        @update:model-value="setLocale"
+        @select="rememberLocale"
       />
       <span class="toolbar__divider" />
       <SegmentedToggle

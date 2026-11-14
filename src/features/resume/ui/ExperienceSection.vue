@@ -9,9 +9,9 @@ defineProps<{
 </script>
 
 <template>
-  <section class="experience">
+  <section class="experience" aria-labelledby="experience-heading">
     <div class="experience__heading">
-      <h2>{{ copy.expHeading }}</h2>
+      <h2 id="experience-heading">{{ copy.expHeading }}</h2>
     </div>
     <ExperienceItem
       v-for="(job, index) in jobs"

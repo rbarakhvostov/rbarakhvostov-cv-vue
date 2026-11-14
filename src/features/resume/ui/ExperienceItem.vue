@@ -14,12 +14,16 @@ defineProps<{
 <template>
   <article class="job" :class="{ 'is-first': isFirst }">
     <div class="job__meta">
-      <h4 class="job__company">{{ job.company }}</h4>
+      <h3 class="job__company">{{ job.company }}</h3>
       <div class="job__period">{{ job.period }}</div>
       <div class="job__urls">
-        <a v-for="url in job.urls" :key="url.href" :href="url.href">{{
-          url.label
-        }}</a>
+        <a
+          v-for="url in job.urls"
+          :key="url.href"
+          :href="url.href"
+          rel="noopener"
+          >{{ url.label }}</a
+        >
       </div>
     </div>
     <div class="job__body">

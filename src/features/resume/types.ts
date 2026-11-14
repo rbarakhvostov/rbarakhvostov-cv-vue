@@ -17,7 +17,17 @@ export type ResumeCopy = {
   roleVue: string;
   lightLabel: string;
   darkLabel: string;
+  pdfLabel: string;
   jobs: Record<JobId, readonly string[]>;
+};
+
+export type SeoCopy = {
+  title: string;
+  description: string;
+  ogLocale: string;
+  imageAlt: string;
+  firstName: string;
+  lastName: string;
 };
 
 export type JobUrl = {

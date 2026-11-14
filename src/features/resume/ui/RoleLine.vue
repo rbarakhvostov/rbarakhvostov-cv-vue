@@ -11,18 +11,22 @@ const parts = computed(() => splitRoles(value));
 </script>
 
 <template>
-  <div class="role-line">
+  <p class="role-line">
     <template v-for="part in parts" :key="part.text">
       <span v-if="part.showSep" class="role-line__sep">|</span>
       <span class="role-line__item">{{ part.text }}</span>
     </template>
-  </div>
+  </p>
 </template>
 
 <style scoped>
 .role-line {
   display: flex;
   flex-wrap: wrap;
+
+  /* Обнуляем браузерный отступ <p>: внешние отступы задают потребители
+     (.header__roles, .job__role). */
+  margin-top: 0;
 }
 
 .role-line__sep {

@@ -23,6 +23,24 @@ export default defineConfigWithVueTs(
     files: ['src/**/__tests__/*'],
   },
 
+  // SSR-энтри выполняется в Node во время сборки. Типами это не поймать:
+  // tsconfig без DOM пришлось бы применить ко всему графу импортов от App.vue,
+  // куда законно входят клиентские useResumeTheme / useResumeLocale.
+  {
+    name: 'app/ssr-entry',
+    files: ['src/entry-server.ts'],
+    rules: {
+      'no-restricted-globals': [
+        'error',
+        'document',
+        'window',
+        'localStorage',
+        'navigator',
+        'location',
+      ],
+    },
+  },
+
   skipFormatting,
 
   // Placed after skipFormatting so Prettier's config cannot switch them off.

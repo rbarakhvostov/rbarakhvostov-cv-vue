@@ -73,9 +73,9 @@ const onToastClose = (): void => {
 </script>
 
 <template>
-  <section class="feedback" data-print-hide>
+  <section class="feedback" data-print-hide aria-labelledby="feedback-heading">
     <div class="feedback__heading">
-      <h2>{{ copy.heading }}</h2>
+      <h2 id="feedback-heading">{{ copy.heading }}</h2>
     </div>
     <div class="feedback__rule" />
 

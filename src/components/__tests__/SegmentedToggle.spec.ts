@@ -37,4 +37,57 @@ describe('SegmentedToggle', () => {
     expect(second?.classes()).toContain('is-on');
     expect(first?.attributes('aria-pressed')).toBe('false');
   });
+
+  it('renders options with an href as links and leaves the model alone', async () => {
+    const wrapper = mount(SegmentedToggle, {
+      props: {
+        modelValue: 'en',
+        options: [
+          { value: 'en', label: 'EN', href: '/' },
+          { value: 'ru', label: 'RU', href: '/ru/' },
+        ] as const,
+      },
+    });
+
+    expect(wrapper.findAll('button')).toHaveLength(0);
+
+    const links = wrapper.findAll('a');
+    const [first, second] = links;
+
+    expect(links).toHaveLength(2);
+    expect(first?.attributes('href')).toBe('/');
+    expect(first?.attributes('hreflang')).toBe('en');
+    expect(first?.attributes('aria-current')).toBe('true');
+    expect(first?.classes()).toContain('is-on');
+
+    // На ссылке aria-pressed неуместен — роль выбранного несёт aria-current.
+    expect(first?.attributes('aria-pressed')).toBeUndefined();
+    expect(second?.attributes('href')).toBe('/ru/');
+    expect(second?.attributes('aria-current')).toBeUndefined();
+
+    // Переход делает браузер: клик не должен менять модель и перерисовывать
+    // страницу на другом языке перед уходом с неё.
+    // preventDefault — чтобы jsdom не ругался на несуществующую навигацию.
+    const swallowNavigation = (event: Event): void => {
+      event.preventDefault();
+    };
+
+    second?.element.addEventListener('click', swallowNavigation);
+    await second?.trigger('click');
+
+    expect(wrapper.emitted('update:modelValue')).toBeUndefined();
+
+    // …но о выборе всё равно сообщает: по этому событию запоминается язык.
+    expect(wrapper.emitted('select')?.[0]).toEqual(['ru']);
+  });
+
+  it('reports a select for button options too', async () => {
+    const wrapper = mount(SegmentedToggle, {
+      props: { modelValue: 'en', options },
+    });
+
+    await wrapper.findAll('button')[1]?.trigger('click');
+
+    expect(wrapper.emitted('select')?.[0]).toEqual(['ru']);
+  });
 });

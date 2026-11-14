@@ -7,16 +7,16 @@ defineProps<{
 </script>
 
 <template>
-  <section class="skills">
+  <section class="skills" aria-labelledby="skills-heading">
     <div class="skills__heading">
-      <h2>{{ heading }}</h2>
+      <h2 id="skills-heading">{{ heading }}</h2>
     </div>
     <div class="skills__rule" />
-    <div class="skills__list">
-      <span v-for="skill in skills" :key="skill" class="skills__chip">{{
-        skill
-      }}</span>
-    </div>
+    <ul class="skills__list">
+      <li v-for="skill in skills" :key="skill" class="skills__chip">
+        {{ skill }}
+      </li>
+    </ul>
   </section>
 </template>
 
@@ -56,6 +56,9 @@ defineProps<{
   display: flex;
   flex-wrap: wrap;
   gap: 7px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
 .skills__chip {

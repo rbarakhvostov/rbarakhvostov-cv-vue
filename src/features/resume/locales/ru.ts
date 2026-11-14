@@ -14,6 +14,7 @@ export const ru: ResumeCopy = {
   roleVue: 'Software Engineer | Vue Frontend Developer',
   lightLabel: 'Светлая',
   darkLabel: 'Тёмная',
+  pdfLabel: 'Скачать резюме в PDF',
   jobs: {
     alfa: [
       'Разрабатывал платформу для операторов банка, сократив операционные издержки более чем на 50% и ускорив обработку клиентских запросов',

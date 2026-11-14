@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 
 import { getPdfAsset } from '../data/pdf';
+import { getResumeCopy } from '../locales';
 import type { Locale } from '../types';
 
 const { locale } = defineProps<{
@@ -9,6 +10,7 @@ const { locale } = defineProps<{
 }>();
 
 const asset = computed(() => getPdfAsset(locale));
+const label = computed(() => getResumeCopy(locale).pdfLabel);
 </script>
 
 <template>
@@ -17,7 +19,7 @@ const asset = computed(() => getPdfAsset(locale));
     data-print-hide
     :href="asset.href"
     :download="asset.fileName"
-    aria-label="PDF"
+    :aria-label="label"
   >
     <svg
       width="15"

@@ -16,7 +16,9 @@ defineProps<{
       <div class="header__contacts">
         <template v-for="(contact, index) in contacts" :key="contact.href">
           <span v-if="index > 0" class="header__sep">|</span>
-          <a :href="contact.href">{{ contact.label }}</a>
+          <!-- rel="me" связывает страницу с профилями: по ней поисковик
+               понимает, что это тот же человек, что в LinkedIn и GitHub. -->
+          <a :href="contact.href" rel="me noopener">{{ contact.label }}</a>
         </template>
       </div>
     </div>

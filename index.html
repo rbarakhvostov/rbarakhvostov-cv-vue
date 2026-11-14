@@ -2,26 +2,68 @@
 <html lang="en" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" href="cv.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="/cv.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <title>Roman Barakhvostov</title>
+    <!--app-head-->
     <!--
-      Тема и язык до первой отрисовки: main.ts — deferred-модуль, без этого
-      светлая/русская версия мигнула бы тёмной английской.
-      Правила разрешения должны совпадать с useResumeTheme / useResumeLocale.
+      Выполняется до первой отрисовки, потому что main.ts — отложенный модуль.
+      Делает ровно две вещи: выбирает язык для корня и ставит тему, чтобы
+      светлая версия не мигнула тёмной. Правила темы обязаны совпадать с
+      useResumeTheme, правила языка — с localeFromPath.
     -->
     <script>
       (function () {
-        var root = document.documentElement;
-        var theme = null;
-        var lang = null;
+        var LANG_KEY = 'rb-resume-lang';
+        var THEME_KEY = 'rb-resume-theme';
 
-        try {
-          theme = localStorage.getItem('rb-resume-theme');
-          lang = localStorage.getItem('rb-resume-lang');
-        } catch (error) {
-          // private mode / blocked storage
+        var read = function (key) {
+          try {
+            return localStorage.getItem(key);
+          } catch (error) {
+            // private mode / blocked storage
+            return null;
+          }
+        };
+
+        var prefersRussian = function () {
+          var tags = navigator.languages || [navigator.language];
+
+          for (var i = 0; i < tags.length; i += 1) {
+            var language = String(tags[i] || '')
+              .split('-')[0]
+              .toLowerCase();
+
+            if (language === 'en' || language === 'ru') {
+              return language === 'ru';
+            }
+          }
+
+          return false;
+        };
+
+        var storedLang = read(LANG_KEY);
+
+        if (storedLang !== 'en' && storedLang !== 'ru') {
+          storedLang = null;
         }
+
+        // Уводим только с корня: /ru/ — явно запрошенный адрес, его не трогаем.
+        // Сохранённый выбор сильнее языка браузера, поэтому клик по EN
+        // выключает автоопределение навсегда. Без этого условия русский
+        // браузер не смог бы уйти с русской версии: редирект срабатывал бы
+        // раньше, чем отложенный main.ts успевает что-либо сделать.
+        var wantsRussian =
+          storedLang === 'ru' || (storedLang === null && prefersRussian());
+
+        if (wantsRussian && location.pathname === '/') {
+          location.replace('/ru/' + location.search + location.hash);
+
+          return;
+        }
+
+        var theme = read(THEME_KEY);
 
         if (theme !== 'light' && theme !== 'dark') {
           theme =
@@ -31,35 +73,19 @@
               : 'dark';
         }
 
-        if (lang !== 'en' && lang !== 'ru') {
-          var tags = navigator.languages || [navigator.language];
-          lang = 'en';
-
-          for (var i = 0; i < tags.length; i += 1) {
-            var language = String(tags[i] || '')
-              .split('-')[0]
-              .toLowerCase();
-
-            if (language === 'en' || language === 'ru') {
-              lang = language;
-              break;
-            }
-          }
-        }
-
-        root.dataset.theme = theme;
-        root.lang = lang;
+        document.documentElement.dataset.theme = theme;
       })();
     </script>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap"
-      rel="stylesheet"
-    />
   </head>
   <body>
-    <div id="app"></div>
+    <!--
+      Якоря <Teleport to="body"> обязаны быть ПЕРВЫМ узлом body: при гидратации
+      Vue стартует с body.firstChild и ждёт там комментарий «teleport start
+      anchor». Любой текстовый узел перед ним — и слой тостов начнёт
+      гидратироваться поверх #app. Плагин сборки съедает пробелы до маркера.
+    -->
+    <!--app-teleports-->
+    <div id="app"><!--app-html--></div>
     <script type="module" src="/src/main.ts"></script>
     <script
       data-goatcounter="https://rbarakhvostov.goatcounter.com/count"
