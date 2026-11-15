@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { contacts } from '../data/contacts';
+import ContactIcon from './ContactIcon.vue';
 import RoleLine from './RoleLine.vue';
 
 defineProps<{
@@ -23,11 +24,13 @@ const targetFor = (href: string): '_blank' | undefined =>
             :href="contact.href"
             :target="targetFor(contact.href)"
             rel="me noopener"
-            >{{ contact.label
+          >
+            <ContactIcon :name="contact.icon" />
+            {{ contact.label
             }}<span v-if="targetFor(contact.href)" class="visually-hidden"
               >&nbsp;{{ newTabHint }}</span
-            ></a
-          >
+            >
+          </a>
         </li>
       </ul>
     </div>
@@ -65,7 +68,7 @@ const targetFor = (href: string): '_blank' | undefined =>
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 8px 12px;
+  gap: 10px 20px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -74,15 +77,17 @@ const targetFor = (href: string): '_blank' | undefined =>
   color: var(--color-role);
 }
 
-.header__contacts li + li {
-  padding-left: 12px;
-  border-left: 1px solid var(--color-divider);
-}
-
 .header__contacts a {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
   color: inherit;
   text-decoration: underline;
   text-decoration-color: color-mix(in srgb, var(--color-role) 40%, transparent);
+}
+
+.header__contacts .contact-icon {
+  color: color-mix(in srgb, var(--color-role) 72%, transparent);
 }
 
 .header__contacts a:hover {
@@ -90,16 +95,15 @@ const targetFor = (href: string): '_blank' | undefined =>
   text-decoration-color: var(--color-accent);
 }
 
+.header__contacts a:hover .contact-icon {
+  color: var(--color-accent);
+}
+
 @media screen and (width <= 640px) {
   .header__contacts {
     flex-direction: column;
     align-items: flex-start;
-    gap: 8px;
-  }
-
-  .header__contacts li + li {
-    padding-left: 0;
-    border-left: 0;
+    gap: 10px;
   }
 }
 </style>

@@ -47,9 +47,12 @@ export type JobMeta = {
   roleKey: RoleKey;
 };
 
+export type ContactIconName = 'mail' | 'telegram' | 'linkedin' | 'github';
+
 export type Contact = {
   href: string;
   label: string;
+  icon: ContactIconName;
 };
 
 export type RolePart = {

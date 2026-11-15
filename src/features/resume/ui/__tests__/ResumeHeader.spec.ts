@@ -32,6 +32,35 @@ describe('ResumeHeader', () => {
     wrapper.unmount();
   });
 
+  it('gives every contact one icon that a screen reader skips', () => {
+    const wrapper = mountHeader();
+
+    for (const link of wrapper.findAll('.header__contacts li > a')) {
+      const icons = link.findAll('svg.contact-icon');
+
+      expect(icons).toHaveLength(1);
+      expect(icons[0]?.attributes('aria-hidden')).toBe('true');
+      expect(icons[0]?.find('path').attributes('d')).toBeTruthy();
+    }
+
+    wrapper.unmount();
+  });
+
+  it('keeps the contact label as the accessible name', () => {
+    const wrapper = mountHeader();
+
+    const links = wrapper.findAll('.header__contacts li > a');
+    expect(links.map((link) => link.text())).toEqual(
+      contacts.map((contact) =>
+        contact.href.startsWith('mailto:')
+          ? contact.label
+          : `${contact.label}\u00a0${en.newTabHint}`,
+      ),
+    );
+
+    wrapper.unmount();
+  });
+
   it('leaves no separator glyph for a screen reader to read out', () => {
     const wrapper = mountHeader();
 
