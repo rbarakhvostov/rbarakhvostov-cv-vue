@@ -3,8 +3,9 @@ import { computed } from 'vue';
 
 import { splitSummary } from '../utils/splitSummary';
 
-const { summary } = defineProps<{
+const { summary, newTabHint } = defineProps<{
   summary: string;
+  newTabHint: string;
 }>();
 
 const parts = computed(() => splitSummary(summary));
@@ -21,7 +22,8 @@ const parts = computed(() => splitSummary(summary));
         href="https://rs.school/"
         target="_blank"
         rel="noopener"
-        >{{ part.text }}</a
+        >{{ part.text
+        }}<span class="visually-hidden">&nbsp;{{ newTabHint }}</span></a
       >
       <template v-else>{{ part.text }}</template>
     </template>

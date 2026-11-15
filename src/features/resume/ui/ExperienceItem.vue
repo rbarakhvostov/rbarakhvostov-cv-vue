@@ -7,6 +7,7 @@ defineProps<{
   job: JobMeta;
   roleLine: string;
   bullets: readonly string[];
+  newTabHint: string;
   isFirst?: boolean;
 }>();
 </script>
@@ -24,7 +25,10 @@ defineProps<{
       <div class="job__period">{{ job.period }}</div>
       <ul class="job__urls" role="list">
         <li v-for="url in job.urls" :key="url.href">
-          <a :href="url.href" target="_blank" rel="noopener">{{ url.label }}</a>
+          <a :href="url.href" target="_blank" rel="noopener"
+            >{{ url.label
+            }}<span class="visually-hidden">&nbsp;{{ newTabHint }}</span></a
+          >
         </li>
       </ul>
     </div>

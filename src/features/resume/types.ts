@@ -21,6 +21,7 @@ export type ResumeCopy = {
   lightLabel: string;
   darkLabel: string;
   pdfLabel: string;
+  newTabHint: string;
   jobs: Record<JobId, readonly string[]>;
 };
 

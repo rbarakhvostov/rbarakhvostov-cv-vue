@@ -19,6 +19,7 @@ defineProps<{
       :job="job"
       :role-line="copy[job.roleKey]"
       :bullets="copy.jobs[job.id]"
+      :new-tab-hint="copy.newTabHint"
       :is-first="index === 0"
     />
   </section>

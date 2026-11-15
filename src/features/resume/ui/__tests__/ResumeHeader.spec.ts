@@ -7,7 +7,11 @@ import ResumeHeader from '../ResumeHeader.vue';
 
 const mountHeader = () => {
   return mount(ResumeHeader, {
-    props: { name: en.name, roleLine: en.roleLine },
+    props: {
+      name: en.name,
+      roleLine: en.roleLine,
+      newTabHint: en.newTabHint,
+    },
   });
 };
 
@@ -32,6 +36,19 @@ describe('ResumeHeader', () => {
     const wrapper = mountHeader();
 
     expect(wrapper.get('.header__contacts').text()).not.toContain('|');
+
+    wrapper.unmount();
+  });
+
+  it('warns about a new tab only on the contacts that open one', () => {
+    const wrapper = mountHeader();
+
+    for (const link of wrapper.findAll('.header__contacts li > a')) {
+      const opensTab = !link.attributes('href')?.startsWith('mailto:');
+
+      expect(link.attributes('target')).toBe(opensTab ? '_blank' : undefined);
+      expect(link.find('.visually-hidden').exists()).toBe(opensTab);
+    }
 
     wrapper.unmount();
   });

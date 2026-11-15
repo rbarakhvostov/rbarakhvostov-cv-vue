@@ -17,8 +17,15 @@ const { copy } = useResumeLocale();
       <a class="skip-link" href="#main">{{ copy.skipToContent }}</a>
       <ResumeToolbar />
       <main id="main" tabindex="-1">
-        <ResumeHeader :name="copy.name" :role-line="copy.roleLine" />
-        <ResumeSummary :summary="copy.summary" />
+        <ResumeHeader
+          :name="copy.name"
+          :role-line="copy.roleLine"
+          :new-tab-hint="copy.newTabHint"
+        />
+        <ResumeSummary
+          :summary="copy.summary"
+          :new-tab-hint="copy.newTabHint"
+        />
         <ExperienceSection :copy="copy" />
         <SkillsSection :heading="copy.skillsHeading" />
         <FeedbackForm />

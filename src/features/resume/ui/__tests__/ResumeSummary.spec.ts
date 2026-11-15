@@ -7,8 +7,12 @@ import ResumeSummary from '../ResumeSummary.vue';
 
 describe('ResumeSummary', () => {
   it('highlights the title and years in English and Russian summaries', () => {
-    const enWrapper = mount(ResumeSummary, { props: { summary: en.summary } });
-    const ruWrapper = mount(ResumeSummary, { props: { summary: ru.summary } });
+    const enWrapper = mount(ResumeSummary, {
+      props: { summary: en.summary, newTabHint: en.newTabHint },
+    });
+    const ruWrapper = mount(ResumeSummary, {
+      props: { summary: ru.summary, newTabHint: ru.newTabHint },
+    });
 
     expect(
       enWrapper.findAll('.summary__highlight').map((node) => node.text()),

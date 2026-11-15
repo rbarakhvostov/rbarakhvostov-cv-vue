@@ -5,6 +5,7 @@ import RoleLine from './RoleLine.vue';
 defineProps<{
   name: string;
   roleLine: string;
+  newTabHint: string;
 }>();
 
 const targetFor = (href: string): '_blank' | undefined =>
@@ -22,7 +23,10 @@ const targetFor = (href: string): '_blank' | undefined =>
             :href="contact.href"
             :target="targetFor(contact.href)"
             rel="me noopener"
-            >{{ contact.label }}</a
+            >{{ contact.label
+            }}<span v-if="targetFor(contact.href)" class="visually-hidden"
+              >&nbsp;{{ newTabHint }}</span
+            ></a
           >
         </li>
       </ul>

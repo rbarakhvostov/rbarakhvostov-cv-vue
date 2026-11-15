@@ -18,6 +18,7 @@ export const en: ResumeCopy = {
   lightLabel: 'Light theme',
   darkLabel: 'Dark theme',
   pdfLabel: 'Download CV as PDF',
+  newTabHint: '(opens in a new tab)',
   jobs: {
     alfa: [
       'Built a custom platform for bank operators that cut operational overhead by over 50% and sped up client request processing',
