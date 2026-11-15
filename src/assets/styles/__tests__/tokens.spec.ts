@@ -73,6 +73,7 @@ describe('css custom properties', () => {
       '--color-divider',
       '--color-control-border',
       '--color-danger',
+      '--color-form-danger',
       '--color-success',
       '--control-raised',
       '--control-raised-shadow',

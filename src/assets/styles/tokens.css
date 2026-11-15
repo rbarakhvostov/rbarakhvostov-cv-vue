@@ -10,6 +10,7 @@
   --color-control-border: color-mix(in srgb, #ededea 42%, transparent);
 
   --color-danger: #ff7a6e;
+  --color-form-danger: #ff7a6e;
   --color-success: #7ecf96;
 
   --font-heading: 'Inter', system-ui, sans-serif;
@@ -54,6 +55,7 @@
   --color-control-border: color-mix(in srgb, #1a1a18 56%, transparent);
 
   --color-danger: #a02116;
+  --color-form-danger: #c73123;
   --color-success: #2b6b3f;
   --shadow-lg: 0 0 0 1px #d8d5cc, 0 16px 40px rgb(26 26 24 / 16%);
 

@@ -24,7 +24,7 @@ defineProps<{
       <div class="job__period">{{ job.period }}</div>
       <ul class="job__urls" role="list">
         <li v-for="url in job.urls" :key="url.href">
-          <a :href="url.href" rel="noopener">{{ url.label }}</a>
+          <a :href="url.href" target="_blank" rel="noopener">{{ url.label }}</a>
         </li>
       </ul>
     </div>
@@ -77,6 +77,7 @@ defineProps<{
 .job__company {
   margin: 0 0 4px;
   font-size: 19px;
+  font-weight: 600;
 }
 
 .job__period {
@@ -118,6 +119,10 @@ defineProps<{
   margin-bottom: 12px;
   color: var(--color-role);
   font-size: 14.5px;
+}
+
+.job__role :deep(.role-line__item) {
+  font-weight: 600;
 }
 
 .job__bullets {

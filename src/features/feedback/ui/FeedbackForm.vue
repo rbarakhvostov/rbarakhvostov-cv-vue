@@ -253,7 +253,7 @@ const onToastClose = (): void => {
 }
 
 .feedback__required {
-  color: var(--color-danger);
+  color: var(--color-form-danger);
 }
 
 .feedback__control {
@@ -286,7 +286,7 @@ const onToastClose = (): void => {
 
 .feedback__field-error {
   margin: 0;
-  color: var(--color-danger);
+  color: var(--color-form-danger);
   font-size: 12.5px;
 }
 

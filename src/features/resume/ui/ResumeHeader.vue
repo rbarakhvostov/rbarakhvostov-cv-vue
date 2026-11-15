@@ -6,6 +6,9 @@ defineProps<{
   name: string;
   roleLine: string;
 }>();
+
+const targetFor = (href: string): '_blank' | undefined =>
+  href.startsWith('http') ? '_blank' : undefined;
 </script>
 
 <template>
@@ -15,7 +18,12 @@ defineProps<{
       <RoleLine class="header__roles" :value="roleLine" />
       <ul class="header__contacts" role="list">
         <li v-for="contact in contacts" :key="contact.href">
-          <a :href="contact.href" rel="me noopener">{{ contact.label }}</a>
+          <a
+            :href="contact.href"
+            :target="targetFor(contact.href)"
+            rel="me noopener"
+            >{{ contact.label }}</a
+          >
         </li>
       </ul>
     </div>
@@ -58,7 +66,7 @@ defineProps<{
   padding: 0;
   list-style: none;
   font-size: 13.5px;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--color-role);
 }
 
