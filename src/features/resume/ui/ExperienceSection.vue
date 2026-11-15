@@ -26,14 +26,14 @@ defineProps<{
 
 <style scoped>
 .experience {
-  margin-top: clamp(22px, 3.5vw, 38px);
+  margin-top: clamp(20px, 3.5vw, 36px);
 }
 
 .experience__heading {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 6px;
+  margin-bottom: 4px;
 }
 
 .experience__heading h2 {

@@ -33,6 +33,10 @@ export const useFeedbackForm = () => {
   });
 
   const submit = async (): Promise<void> => {
+    if (status.value === 'sending') {
+      return;
+    }
+
     if (botcheck.value) {
       status.value = 'success';
       errorReason.value = null;

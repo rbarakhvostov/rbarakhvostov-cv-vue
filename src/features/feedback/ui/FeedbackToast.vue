@@ -113,8 +113,8 @@ onScopeDispose(clear);
           @click="emit('close')"
         >
           <svg
-            width="14"
-            height="14"
+            width="16"
+            height="16"
             viewBox="0 0 16 16"
             fill="none"
             stroke="currentColor"
@@ -148,7 +148,7 @@ onScopeDispose(clear);
   align-items: flex-start;
   gap: 12px;
   width: min(440px, 100%);
-  padding: 12px 14px;
+  padding: 12px;
   border-left: 3px solid var(--toast-accent);
   border-radius: var(--radius-md);
   background: var(--color-surface);
@@ -179,22 +179,35 @@ onScopeDispose(clear);
 }
 
 .feedback-toast__close {
+  position: relative;
   display: flex;
   flex: none;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
+  width: var(--control-height);
+  height: var(--control-height);
   padding: 0;
   border: 0;
   border-radius: var(--radius-sm);
   background: transparent;
   color: color-mix(in srgb, var(--color-text) 72%, transparent);
   cursor: pointer;
+  transition: var(--control-transition);
+}
+
+.feedback-toast__close::after {
+  content: '';
+  position: absolute;
+  inset: var(--control-hit-inset);
 }
 
 .feedback-toast__close:hover {
-  background: color-mix(in srgb, var(--color-text) 10%, transparent);
+  background: var(--control-wash);
+  color: var(--color-text);
+}
+
+.feedback-toast__close:active {
+  background: var(--control-wash-strong);
   color: var(--color-text);
 }
 

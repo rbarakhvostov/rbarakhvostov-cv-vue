@@ -22,8 +22,8 @@ const label = computed(() => getResumeCopy(locale).pdfLabel);
     :aria-label="label"
   >
     <svg
-      width="15"
-      height="15"
+      width="16"
+      height="16"
       viewBox="0 0 16 16"
       fill="none"
       stroke="currentColor"
@@ -42,26 +42,41 @@ const label = computed(() => getResumeCopy(locale).pdfLabel);
 
 <style scoped>
 .pdf-link {
+  position: relative;
   box-sizing: border-box;
   display: inline-flex;
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  height: 34px;
-  padding: 0 10px;
-  border: 0;
-  border-radius: calc(var(--radius-md) - 2px);
-  background: color-mix(in srgb, var(--color-accent) 16%, transparent);
-  color: var(--color-role);
+  gap: 8px;
+  height: var(--control-height);
+  padding: 0 12px;
+  border: 1px solid var(--color-control-border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: color-mix(in srgb, var(--color-text) 72%, transparent);
   font-size: 12.5px;
   letter-spacing: 0.04em;
   text-decoration: none;
+  transition: var(--control-transition);
+}
+
+.pdf-link::after {
+  content: '';
+  position: absolute;
+  inset: var(--control-hit-inset) 0;
 }
 
 .pdf-link:hover {
-  background: color-mix(in srgb, var(--color-text) 7%, transparent);
-  color: var(--color-role);
+  border-color: var(--color-accent);
+  background: var(--control-wash);
+  color: var(--color-text);
+}
+
+.pdf-link:active {
+  border-color: var(--color-accent);
+  background: var(--control-wash-strong);
+  color: var(--color-text);
 }
 
 .pdf-link svg {

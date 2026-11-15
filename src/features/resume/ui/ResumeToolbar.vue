@@ -35,7 +35,7 @@ const themeOptions = computed(
 
 <template>
   <header class="toolbar" data-print-hide>
-    <div class="toolbar__group">
+    <div class="toolbar__group toolbar__group--plain">
       <PdfDownloadLink :locale="locale" />
     </div>
     <div class="toolbar__group">
@@ -55,8 +55,8 @@ const themeOptions = computed(
         <template #default="{ option }">
           <svg
             v-if="option.value === 'light'"
-            width="17"
-            height="17"
+            width="16"
+            height="16"
             viewBox="0 0 16 16"
             fill="none"
             stroke="currentColor"
@@ -76,8 +76,8 @@ const themeOptions = computed(
           </svg>
           <svg
             v-else
-            width="17"
-            height="17"
+            width="16"
+            height="16"
             viewBox="0 0 16 16"
             fill="currentColor"
             aria-hidden="true"
@@ -96,18 +96,24 @@ const themeOptions = computed(
   flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
-  margin-bottom: clamp(18px, 3vw, 26px);
+  gap: 8px;
+  margin-bottom: clamp(16px, 3vw, 24px);
 }
 
 .toolbar__group {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
   padding: 4px;
   border: 1px solid var(--color-divider);
   border-radius: var(--radius-md);
   background: color-mix(in srgb, var(--color-text) 4%, transparent);
+}
+
+.toolbar__group--plain {
+  padding: 0;
+  border: 0;
+  background: none;
 }
 
 .toolbar__divider {

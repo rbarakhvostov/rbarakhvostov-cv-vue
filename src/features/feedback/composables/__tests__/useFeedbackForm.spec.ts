@@ -65,6 +65,42 @@ describe('useFeedbackForm', () => {
     expect(form.message.value).toBe('');
   });
 
+  it('ignores a second submit while the first request is still in flight', async () => {
+    vi.stubEnv('VITE_WEB3FORMS_ACCESS_KEY', 'test-key');
+
+    let release = (): void => {};
+    const pending = new Promise<void>((resolve) => {
+      release = () => resolve();
+    });
+
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockImplementation(async () => {
+        await pending;
+
+        return { ok: true, json: () => Promise.resolve({ success: true }) };
+      }),
+    );
+
+    const form = useFeedbackForm();
+    form.name.value = 'Ada';
+    form.message.value = 'Hello there';
+
+    const first = form.submit();
+
+    await nextTick();
+    expect(form.status.value).toBe('sending');
+
+    await form.submit();
+
+    expect(fetch).toHaveBeenCalledTimes(1);
+
+    release();
+    await first;
+
+    expect(form.status.value).toBe('success');
+  });
+
   it('reports a server error when Web3Forms responds with success: false', async () => {
     vi.stubEnv('VITE_WEB3FORMS_ACCESS_KEY', 'test-key');
     mockFetchOnce({ success: false, message: 'invalid access key' });

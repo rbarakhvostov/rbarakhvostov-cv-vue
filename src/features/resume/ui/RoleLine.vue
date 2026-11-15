@@ -37,7 +37,7 @@ const parts = computed(() => splitRoles(value));
   .role-line {
     display: grid;
     grid-template-columns: repeat(2, auto);
-    gap: 6px 12px;
+    gap: 8px 12px;
     justify-content: start;
   }
 

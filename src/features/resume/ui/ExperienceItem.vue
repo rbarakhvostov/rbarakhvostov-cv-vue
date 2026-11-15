@@ -51,9 +51,9 @@ defineProps<{
 .job {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px 36px;
-  margin-top: clamp(18px, 2.5vw, 26px);
-  padding: clamp(22px, 3vw, 30px) 0 0;
+  gap: 8px 36px;
+  margin-top: clamp(16px, 2.5vw, 24px);
+  padding: clamp(20px, 3vw, 28px) 0 0;
   background: linear-gradient(
       to right,
       transparent,
@@ -65,12 +65,12 @@ defineProps<{
 }
 
 .job.is-first {
-  margin-top: clamp(6px, 1vw, 12px);
+  margin-top: clamp(4px, 1vw, 12px);
 }
 
 .job__meta {
   position: relative;
-  flex: 0 1 210px;
+  flex: 0 1 208px;
   min-width: 180px;
 }
 
@@ -80,7 +80,7 @@ defineProps<{
 }
 
 .job__period {
-  margin-bottom: 6px;
+  margin-bottom: 4px;
   color: color-mix(in srgb, var(--color-text) 72%, transparent);
   font-size: 12.5px;
   letter-spacing: 0.04em;
@@ -89,7 +89,7 @@ defineProps<{
 .job__urls {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -111,7 +111,7 @@ defineProps<{
 
 .job__body {
   flex: 1 1 440px;
-  min-width: 250px;
+  min-width: 248px;
 }
 
 .job__role {
@@ -123,7 +123,7 @@ defineProps<{
 .job__bullets {
   display: flex;
   flex-direction: column;
-  gap: 9px;
+  gap: 8px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -139,7 +139,7 @@ defineProps<{
 }
 
 .job__number {
-  color: var(--color-accent);
+  color: var(--color-text);
   font-weight: 600;
 }
 
@@ -148,9 +148,9 @@ defineProps<{
   position: absolute;
   top: 11px;
   left: 0;
-  width: 9px;
+  width: 8px;
   height: 1px;
-  background: var(--color-accent);
+  background: color-mix(in srgb, var(--color-text) 55%, transparent);
 }
 
 @media screen and (width <= 640px) {

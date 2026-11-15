@@ -31,7 +31,7 @@ const parts = computed(() => splitSummary(summary));
 <style scoped>
 .summary {
   max-width: 88ch;
-  margin: clamp(14px, 2vw, 22px) 0 0;
+  margin: clamp(12px, 2vw, 20px) 0 0;
   color: color-mix(in srgb, var(--color-text) 88%, transparent);
   font-size: clamp(14.5px, 1.7vw, 16.5px);
   line-height: 1.65;
@@ -39,7 +39,7 @@ const parts = computed(() => splitSummary(summary));
 }
 
 .summary__highlight {
-  color: var(--color-accent);
+  color: var(--color-text);
   font-weight: 600;
 }
 

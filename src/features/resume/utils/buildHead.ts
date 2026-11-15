@@ -14,8 +14,8 @@ import { buildJsonLd } from './buildJsonLd';
 import { escapeHtml, escapeJsonLd } from './escapeHtml';
 
 const THEME_COLORS = {
-  dark: '#161826',
-  light: '#f3f5fe',
+  dark: '#121211',
+  light: '#fffdf8',
 } as const;
 
 const meta = (

@@ -38,7 +38,7 @@ const { copy } = useResumeLocale();
 .page__inner {
   max-width: 1020px;
   margin: 0 auto;
-  padding: clamp(26px, 5vw, 60px) clamp(20px, 5vw, 64px) 96px;
+  padding: clamp(24px, 5vw, 60px) clamp(20px, 5vw, 64px) 96px;
 }
 
 .skip-link {
@@ -55,9 +55,11 @@ const { copy } = useResumeLocale();
   top: 12px;
   left: 12px;
   z-index: 60;
+  display: inline-flex;
+  align-items: center;
   width: auto;
-  height: auto;
-  padding: 10px 16px;
+  height: 40px;
+  padding: 0 16px;
   overflow: visible;
   border-radius: var(--radius-md);
   background: var(--color-surface);

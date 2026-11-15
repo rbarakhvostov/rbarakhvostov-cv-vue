@@ -29,7 +29,7 @@ defineProps<{
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: clamp(6px, 1vw, 12px);
+  margin-bottom: clamp(4px, 1vw, 12px);
 }
 
 .skills__heading h2 {
@@ -42,7 +42,7 @@ defineProps<{
 
 .skills__rule {
   height: 1px;
-  margin-bottom: clamp(16px, 2.5vw, 22px);
+  margin-bottom: clamp(16px, 2.5vw, 20px);
   background: linear-gradient(
     to right,
     transparent,
@@ -55,15 +55,15 @@ defineProps<{
 .skills__list {
   display: flex;
   flex-wrap: wrap;
-  gap: 7px;
+  gap: 8px;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
 .skills__chip {
-  padding: 4px 11px;
-  border-radius: 6px;
+  padding: 4px 12px;
+  border-radius: var(--radius-sm);
   background: var(--chip-bg);
   color: var(--chip-fg);
   font-size: 12.5px;
@@ -71,12 +71,11 @@ defineProps<{
 
 @media screen and (width <= 640px) {
   .skills__list {
-    gap: 5px;
+    gap: 4px;
   }
 
   .skills__chip {
-    padding: 2px 7px;
-    border-radius: 4px;
+    padding: 4px 8px;
     font-size: 11px;
   }
 }

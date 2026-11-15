@@ -37,7 +37,7 @@ defineProps<{
 }
 
 .header__name {
-  margin: 0 0 10px;
+  margin: 0 0 8px;
   font-size: clamp(29px, 5.4vw, 46px);
   letter-spacing: -0.025em;
   line-height: 1.05;
@@ -53,7 +53,7 @@ defineProps<{
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 6px 12px;
+  gap: 8px 12px;
   margin: 0;
   padding: 0;
   list-style: none;

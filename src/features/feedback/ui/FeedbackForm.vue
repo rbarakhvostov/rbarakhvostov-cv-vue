@@ -164,7 +164,7 @@ const onToastClose = (): void => {
           ref="submit-button"
           class="feedback__submit"
           type="submit"
-          :disabled="status === 'sending'"
+          :aria-disabled="status === 'sending'"
         >
           {{ status === 'sending' ? copy.sendingLabel : copy.sendLabel }}
         </button>
@@ -189,7 +189,7 @@ const onToastClose = (): void => {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: clamp(6px, 1vw, 12px);
+  margin-bottom: clamp(4px, 1vw, 12px);
 }
 
 .feedback__heading h2 {
@@ -202,7 +202,7 @@ const onToastClose = (): void => {
 
 .feedback__rule {
   height: 1px;
-  margin-bottom: clamp(16px, 2.5vw, 22px);
+  margin-bottom: clamp(16px, 2.5vw, 20px);
   background: linear-gradient(
     to right,
     transparent,
@@ -216,11 +216,11 @@ const onToastClose = (): void => {
   padding: clamp(24px, 4vw, 36px);
   border-radius: var(--radius-lg);
   background: color-mix(in srgb, var(--color-accent) 6%, var(--color-bg));
-  box-shadow: 0 0 0 1px var(--color-divider);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--color-text) 24%, transparent);
 }
 
 .feedback__subheading {
-  margin: 0 0 clamp(18px, 2.5vw, 24px);
+  margin: 0 0 clamp(16px, 2.5vw, 24px);
   color: color-mix(in srgb, var(--color-text) 80%, transparent);
   font-size: clamp(15.5px, 1.8vw, 17.5px);
 }
@@ -244,7 +244,7 @@ const onToastClose = (): void => {
 .feedback__field {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
 }
 
 .feedback__label {
@@ -253,17 +253,29 @@ const onToastClose = (): void => {
 }
 
 .feedback__required {
-  color: var(--color-accent);
+  color: var(--color-danger);
 }
 
 .feedback__control {
   box-sizing: border-box;
-  padding: 9px 12px;
+  height: 40px;
+  padding: 0 12px;
   border: 1px solid var(--color-control-border);
   border-radius: var(--radius-md);
   background: var(--color-bg);
   color: var(--color-text);
   font: inherit;
+  transition: var(--control-transition);
+}
+
+.feedback__control--textarea {
+  height: auto;
+  padding: 8px 12px;
+  resize: vertical;
+}
+
+.feedback__control:hover {
+  border-color: color-mix(in srgb, var(--color-text) 72%, transparent);
 }
 
 .feedback__control:focus-visible {
@@ -272,35 +284,45 @@ const onToastClose = (): void => {
   outline-offset: 0;
 }
 
-.feedback__control--textarea {
-  resize: vertical;
-}
-
 .feedback__field-error {
   margin: 0;
-  color: var(--color-accent);
+  color: var(--color-danger);
   font-size: 12.5px;
 }
 
 .feedback__submit {
   align-self: flex-start;
-  padding: 9px 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 40px;
+  padding: 0 20px;
   border: 1px solid var(--color-accent);
   border-radius: var(--radius-md);
-  background: transparent;
-  color: var(--color-accent);
+  background: var(--color-accent);
+  color: var(--color-bg);
   font: inherit;
   font-weight: 500;
   cursor: pointer;
+  transition: var(--control-transition);
 }
 
-.feedback__submit:disabled {
-  opacity: 0.6;
+.feedback__submit[aria-disabled='true'] {
+  border-color: transparent;
+  background: color-mix(in srgb, var(--color-text) 70%, var(--color-bg));
+  color: var(--color-bg);
+  box-shadow: none;
   cursor: not-allowed;
 }
 
-.feedback__submit:hover:not(:disabled) {
-  background: color-mix(in srgb, var(--color-accent) 16%, transparent);
+.feedback__submit:hover:not([aria-disabled='true']) {
+  box-shadow: 0 0 0 4px var(--control-wash-strong);
+}
+
+.feedback__submit:active:not([aria-disabled='true']) {
+  border-color: color-mix(in srgb, var(--color-text) 86%, var(--color-bg));
+  background: color-mix(in srgb, var(--color-text) 86%, var(--color-bg));
+  box-shadow: none;
 }
 
 @media (forced-colors: active) {
@@ -310,6 +332,15 @@ const onToastClose = (): void => {
 
   .feedback__rule {
     background: CanvasText;
+  }
+
+  .feedback__submit {
+    border: 2px solid ButtonText;
+  }
+
+  .feedback__submit[aria-disabled='true'] {
+    border-color: GrayText;
+    color: GrayText;
   }
 }
 </style>

@@ -102,10 +102,26 @@ a:hover {
 }
 
 ::selection {
-  background: color-mix(in srgb, var(--color-accent) 30%, transparent);
+  background: color-mix(in srgb, var(--color-accent) 24%, transparent);
 }
 
 @media print {
+  :root {
+    --color-bg: #fffdf8;
+    --color-surface: #f3f1ea;
+    --color-text: #1a1a18;
+    --color-role: #45433c;
+    --color-divider: color-mix(in srgb, #1a1a18 20%, transparent);
+    --color-control-border: color-mix(in srgb, #1a1a18 56%, transparent);
+    --color-danger: #a02116;
+    --color-success: #2b6b3f;
+    --control-raised: #fffdf8;
+    --control-raised-shadow:
+      0 0 0 1px var(--color-control-border), 0 1px 2px rgb(26 26 24 / 16%);
+    --chip-bg: #e7e4db;
+    --chip-fg: #2e2c27;
+  }
+
   html,
   body {
     background: #fff;

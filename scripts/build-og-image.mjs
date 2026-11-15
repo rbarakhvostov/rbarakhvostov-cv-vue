@@ -15,12 +15,13 @@ const root = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const publicDir = join(root, 'public');
 
 const COLORS = {
-  bg: '#161826',
-  surface: '#232532',
-  text: '#e9e9ed',
-  accent: '#9184d9',
-  accent2: '#a7a1db',
-  muted: '#b2b6ca',
+  bg: '#121211',
+  surface: '#1e1e1c',
+  text: '#ededea',
+  role: '#c9c9c4',
+  chipBg: '#2b2b28',
+  chipFg: '#dedbd4',
+  muted: '#b0b0ad',
 };
 
 const NAME = 'Roman Barakhvostov';
@@ -46,9 +47,7 @@ const ogCard = `<!doctype html>
         justify-content: center;
         gap: 26px;
         padding: 0 86px;
-        background:
-          radial-gradient(900px 520px at 88% -16%, ${COLORS.surface} 0%, transparent 62%),
-          ${COLORS.bg};
+        background: ${COLORS.bg};
         color: ${COLORS.text};
         font-family: Inter, system-ui, sans-serif;
         -webkit-font-smoothing: antialiased;
@@ -57,7 +56,7 @@ const ogCard = `<!doctype html>
         width: 96px;
         height: 5px;
         border-radius: 3px;
-        background: linear-gradient(90deg, ${COLORS.accent}, ${COLORS.accent2});
+        background: ${COLORS.text};
       }
       h1 {
         font-size: 92px;
@@ -69,7 +68,7 @@ const ogCard = `<!doctype html>
         font-size: 40px;
         font-weight: 500;
         letter-spacing: -0.012em;
-        color: ${COLORS.accent2};
+        color: ${COLORS.role};
       }
       .stack {
         display: flex;
@@ -78,10 +77,10 @@ const ogCard = `<!doctype html>
       }
       .chip {
         padding: 9px 20px;
-        border: 1px solid ${COLORS.accent}55;
         border-radius: 999px;
+        background: ${COLORS.chipBg};
         font-size: 25px;
-        color: ${COLORS.muted};
+        color: ${COLORS.chipFg};
       }
       .site {
         position: absolute;

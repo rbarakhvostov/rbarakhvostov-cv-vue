@@ -68,19 +68,22 @@ const onSelect = (option: Option): void => {
 .segmented {
   display: flex;
   align-items: center;
+  gap: 4px;
 }
 
 .segmented__btn {
   appearance: none;
+  position: relative;
   box-sizing: border-box;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  width: 40px;
-  height: 34px;
+  gap: 8px;
+  width: var(--control-height);
+  height: var(--control-height);
   padding: 0;
   border: 0;
+  border-radius: var(--radius-sm);
   background: transparent;
   color: color-mix(in srgb, var(--color-text) 72%, transparent);
   font: inherit;
@@ -88,29 +91,33 @@ const onSelect = (option: Option): void => {
   letter-spacing: 0.04em;
   text-decoration: none;
   cursor: pointer;
+  transition: var(--control-transition);
 }
 
-.segmented__btn:first-child {
-  border-radius: calc(var(--radius-md) - 2px) 0 0 calc(var(--radius-md) - 2px);
-}
-
-.segmented__btn:last-child {
-  border-radius: 0 calc(var(--radius-md) - 2px) calc(var(--radius-md) - 2px) 0;
+.segmented__btn::after {
+  content: '';
+  position: absolute;
+  inset: var(--control-hit-inset) 0;
 }
 
 .segmented__btn:focus-visible {
-  position: relative;
   z-index: 1;
 }
 
 .segmented__btn.is-on {
-  background: color-mix(in srgb, var(--color-accent) 16%, transparent);
-  color: var(--color-role);
-  box-shadow: inset 0 0 0 1px var(--color-accent);
+  background: var(--control-raised);
+  color: var(--color-text);
+  box-shadow: var(--control-raised-shadow);
 }
 
 .segmented__btn:hover:not(.is-on) {
-  background: color-mix(in srgb, var(--color-text) 7%, transparent);
+  background: var(--control-wash);
+  color: var(--color-text);
+}
+
+.segmented__btn:active:not(.is-on) {
+  background: var(--control-wash-strong);
+  color: var(--color-text);
 }
 
 @media (forced-colors: active) {
