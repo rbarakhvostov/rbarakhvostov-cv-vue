@@ -166,6 +166,10 @@ defineProps<{
   .job {
     gap: 16px 36px;
   }
+
+  .job__meta {
+    flex-basis: 100%;
+  }
 }
 
 @media (forced-colors: active) {
