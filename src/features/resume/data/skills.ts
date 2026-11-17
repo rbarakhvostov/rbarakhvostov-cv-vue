@@ -2,7 +2,7 @@ export const skills: readonly string[] = [
   'HTML',
   'CSS',
   'JavaScript',
-  'Typescript',
+  'TypeScript',
   'React',
   'Next.js',
   'Redux',

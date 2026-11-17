@@ -5,6 +5,7 @@ import { jobs } from '../../data/jobs';
 import { skills } from '../../data/skills';
 import { getResumeCopy } from '../../locales';
 import { buildJsonLd, type JsonLdNode } from '../buildJsonLd';
+import { splitRoles } from '../splitRoles';
 
 const findNode = (locale: 'en' | 'ru', type: string): JsonLdNode => {
   const node = buildJsonLd(locale)['@graph'].find(
@@ -30,7 +31,9 @@ describe('buildJsonLd', () => {
     const copy = getResumeCopy('ru');
 
     expect(person.name).toBe(copy.name);
-    expect(person.jobTitle).toBe(copy.roleLine);
+    expect(person.jobTitle).toEqual(
+      splitRoles(copy.roleLine).map((role) => role.text),
+    );
     expect(person.description).toBe(copy.summary);
   });
 

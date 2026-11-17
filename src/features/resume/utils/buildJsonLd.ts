@@ -9,6 +9,7 @@ import {
 import { skills } from '../data/skills';
 import { getResumeCopy } from '../locales';
 import type { Locale } from '../types';
+import { splitRoles } from './splitRoles';
 
 export type JsonLdNode = Record<string, unknown>;
 
@@ -62,7 +63,7 @@ export const buildJsonLd = (locale: Locale): JsonLdGraph => {
     '@id': personId,
     name: copy.name,
     alternateName: alternate.name,
-    jobTitle: copy.roleLine,
+    jobTitle: splitRoles(copy.roleLine).map((role) => role.text),
     description: copy.summary,
     url: pageUrl,
     image: absoluteUrl(OG_IMAGE_PATH),
