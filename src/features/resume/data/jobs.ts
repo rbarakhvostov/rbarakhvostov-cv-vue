@@ -8,7 +8,7 @@ export const jobs: readonly JobMeta[] = [
     urls: [
       { href: 'https://www.alfabank.by', label: 'https://www.alfabank.by' },
     ],
-    roleKey: 'roleReactNext',
+    roleKey: 'roleReactNextAi',
   },
   {
     id: 'senla',

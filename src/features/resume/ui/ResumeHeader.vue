@@ -60,7 +60,7 @@ const targetFor = (href: string): '_blank' | undefined =>
 
 .header__roles {
   margin-bottom: 16px;
-  font-size: clamp(14px, 2.2vw, 17px);
+  font-size: 14px;
   color: var(--color-role);
 }
 

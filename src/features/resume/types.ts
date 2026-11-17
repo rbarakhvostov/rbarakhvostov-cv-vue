@@ -2,7 +2,7 @@ export type Locale = 'en' | 'ru';
 
 export type Theme = 'light' | 'dark';
 
-export type RoleKey = 'roleReactNext' | 'roleReact' | 'roleVue';
+export type RoleKey = 'roleReactNextAi' | 'roleReact' | 'roleVue';
 
 export type JobId = 'alfa' | 'senla' | 'gp' | 'epam';
 
@@ -12,7 +12,7 @@ export type ResumeCopy = {
   summary: string;
   expHeading: string;
   skillsHeading: string;
-  roleReactNext: string;
+  roleReactNextAi: string;
   roleReact: string;
   roleVue: string;
   skipToContent: string;

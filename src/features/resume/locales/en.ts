@@ -3,15 +3,17 @@ import type { ResumeCopy } from '../types';
 export const en: ResumeCopy = {
   name: 'Roman Barakhvostov',
   roleLine:
-    'Software Engineer | Frontend Developer | React Developer | Next.js Developer',
+    'Software Engineer | Frontend Developer | React Developer | Next.js Developer | TypeScript Developer | AI-Assisted Developer',
   summary:
     "Senior Frontend Developer with over 6 years of hands-on experience in building high-quality user interfaces. Proficient in React, TypeScript, and JavaScript, with additional expertise in Next.js, Vue, and React Native. I actively leverage modern AI-powered tools (such as Claude Code, Cursor, GitHub Copilot, Kilo Code, DeepSeek, ChatGPT) to accelerate development workflows, improve code quality, and streamline debugging processes. Beyond development, I have extensive experience conducting technical interviews and participating in client and stakeholder presentations, effectively bridging the gap between technical implementation and business goals. I also have a strong background in mentoring and technical leadership, including active participation in the RS School program. I am ready to apply my technical stack and expertise to drive the growth of your company's products.",
   expHeading: 'PROFESSIONAL EXPERIENCE',
   skillsHeading: 'SKILLS',
-  roleReactNext:
-    'Software Engineer | React Frontend Developer | Next.js Developer',
-  roleReact: 'Software Engineer | React Frontend Developer',
-  roleVue: 'Software Engineer | Vue Frontend Developer',
+  roleReactNextAi:
+    'Software Engineer | React Developer | Next.js Developer | AI-Assisted Developer',
+  roleReact:
+    'Software Engineer | Frontend Developer | React Developer | TypeScript Developer',
+  roleVue:
+    'Software Engineer | Frontend Developer | Vue Developer | JavaScript Developer',
   skipToContent: 'Skip to content',
   langGroupLabel: 'Language',
   themeGroupLabel: 'Theme',

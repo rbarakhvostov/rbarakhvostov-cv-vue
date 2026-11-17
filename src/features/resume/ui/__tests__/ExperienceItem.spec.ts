@@ -11,14 +11,14 @@ const job: JobMeta = {
   company: 'Alfa-Bank',
   period: '2025 -',
   urls: [{ href: 'https://www.alfabank.by', label: 'https://www.alfabank.by' }],
-  roleKey: 'roleReactNext',
+  roleKey: 'roleReactNextAi',
 };
 
 const mountItem = (copy: ResumeCopy = en) => {
   return mount(ExperienceItem, {
     props: {
       job,
-      roleLine: copy.roleReactNext,
+      roleLine: copy.roleReactNextAi,
       bullets: copy.jobs.alfa,
       newTabHint: copy.newTabHint,
     },
