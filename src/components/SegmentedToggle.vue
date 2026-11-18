@@ -83,7 +83,7 @@ const onSelect = (option: Option): void => {
   height: var(--control-height);
   padding: 0;
   border: 0;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   background: transparent;
   color: color-mix(in srgb, var(--color-text) 72%, transparent);
   font: inherit;

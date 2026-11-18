@@ -52,7 +52,7 @@ const label = computed(() => getResumeCopy(locale).pdfLabel);
   height: var(--control-height);
   padding: 0 12px;
   border: 1px solid var(--color-control-border);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   background: transparent;
   color: color-mix(in srgb, var(--color-text) 72%, transparent);
   font-size: 12.5px;
