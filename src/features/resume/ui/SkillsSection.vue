@@ -63,7 +63,7 @@ defineProps<{
 
 .skills__chip {
   padding: 4px 12px;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   background: var(--chip-bg);
   color: var(--chip-fg);
   font-size: 12.5px;
