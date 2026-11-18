@@ -145,7 +145,7 @@ onScopeDispose(clear);
 
 .feedback-toast {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 12px;
   width: min(440px, 100%);
   padding: 12px;
