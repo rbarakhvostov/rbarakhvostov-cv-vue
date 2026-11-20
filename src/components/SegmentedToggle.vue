@@ -19,6 +19,9 @@ const model = defineModel<T>({ required: true });
 const { options } = defineProps<{
   options: readonly Option[];
   label: string;
+  // Подсветку рисует CSS по `html[data-theme]`, а не по `.is-on`: пререндер не
+  // знает тему посетителя и всегда отдаёт `is-on` на «тёмной».
+  paintFromDocumentTheme?: boolean;
 }>();
 
 const attrsFor = (option: Option): Record<string, unknown> => {
@@ -49,13 +52,19 @@ const onSelect = (option: Option): void => {
 </script>
 
 <template>
-  <div class="segmented" role="group" :aria-label="label">
+  <div
+    class="segmented"
+    :class="{ 'segmented--theme': paintFromDocumentTheme }"
+    role="group"
+    :aria-label="label"
+  >
     <component
       :is="option.href ? 'a' : 'button'"
       v-for="option in options"
       :key="option.value"
       class="segmented__btn"
       :class="{ 'is-on': model === option.value }"
+      :data-value="option.value"
       v-bind="attrsFor(option)"
       @click="onSelect(option)"
     >
@@ -104,7 +113,14 @@ const onSelect = (option: Option): void => {
   z-index: 1;
 }
 
-.segmented__btn.is-on {
+/* Пилюля темы рисуется от `html[data-theme]`, который инлайн-скрипт ставит до
+   первой отрисовки: в пререндеренной разметке `is-on` всегда на «тёмной», и у
+   светлого посетителя первый кадр подсветил бы не тот сегмент. На
+   `prefers-color-scheme` здесь завязываться нельзя — он не знает о сохранённом
+   выборе. */
+.segmented:not(.segmented--theme) .segmented__btn.is-on,
+html[data-theme='light'] .segmented--theme .segmented__btn[data-value='light'],
+html[data-theme='dark'] .segmented--theme .segmented__btn[data-value='dark'] {
   background: var(--control-raised);
   color: var(--color-text);
   box-shadow: var(--control-raised-shadow);
@@ -120,8 +136,14 @@ const onSelect = (option: Option): void => {
   color: var(--color-text);
 }
 
+/* В forced-colors фон и тень перебивает система, и рамка остаётся единственным
+   индикатором выбора — тот же список селекторов. */
 @media (forced-colors: active) {
-  .segmented__btn.is-on {
+  .segmented:not(.segmented--theme) .segmented__btn.is-on,
+  html[data-theme='light']
+    .segmented--theme
+    .segmented__btn[data-value='light'],
+  html[data-theme='dark'] .segmented--theme .segmented__btn[data-value='dark'] {
     border: 2px solid Highlight;
   }
 }

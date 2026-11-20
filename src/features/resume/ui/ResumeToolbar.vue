@@ -47,6 +47,7 @@ const themeOptions = computed(
         :model-value="theme"
         :options="themeOptions"
         :label="copy.themeGroupLabel"
+        paint-from-document-theme
         @update:model-value="setTheme"
       >
         <template #default="{ option }">

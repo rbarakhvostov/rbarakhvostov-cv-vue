@@ -159,5 +159,13 @@ describe('инлайн-скрипт index.html', () => {
     it('не трогает тему, когда уводит на другую локаль', () => {
       expect(run({ languages: ['ru'] }).theme).toBeUndefined();
     });
+
+    // Пилюля в переключателе темы рисуется селектором по этому атрибуту, так
+    // что он обязан быть в разметке ещё до того, как отработает скрипт.
+    it('отдаёт data-theme на <html> до выполнения скрипта', () => {
+      expect(readFileSync(INDEX_HTML, 'utf8')).toContain(
+        '<html lang="en" data-theme="dark">',
+      );
+    });
   });
 });
