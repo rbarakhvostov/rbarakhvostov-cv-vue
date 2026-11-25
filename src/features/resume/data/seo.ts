@@ -2,6 +2,11 @@ import type { Locale, SeoCopy } from '../types';
 
 export const SITE_URL = 'https://roman-barakhvostov-cv.netlify.app';
 
+// `lastmod` в sitemap. Двигать при правке контента резюме (`data/`, `locales/`),
+// а не при правке вёрстки: дата сборки меняла бы её на каждый деплой, а Google
+// перестаёт верить `lastmod`, который систематически расходится с контентом.
+export const CONTENT_UPDATED = '2026-11-17';
+
 export const OG_IMAGE_PATH = '/og-image.png';
 export const OG_IMAGE_WIDTH = 1200;
 export const OG_IMAGE_HEIGHT = 630;

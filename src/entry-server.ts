@@ -4,6 +4,7 @@ import { renderToString } from 'vue/server-renderer';
 import App from './App.vue';
 import { setResumeLocale } from './features/resume/composables/useResumeLocale';
 import {
+  CONTENT_UPDATED,
   DEFAULT_LOCALE,
   LOCALE_PATHS,
   LOCALES,
@@ -40,5 +41,5 @@ export const renderAll = async (): Promise<readonly PrerenderedPage[]> => {
 };
 
 export const renderSitemap = (): string => {
-  return buildSitemap(new Date().toISOString().slice(0, 10));
+  return buildSitemap(CONTENT_UPDATED);
 };
